@@ -35,7 +35,7 @@
 ### Quick Start
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/stockwise.git
+git clone https://github.com/Masachusets/stockwise.git
 cd stockwise
 
 # 2. Install dependencies

@@ -38,7 +38,7 @@
 ### Быстрый старт
 ```bash
 # 1. Клонируйте репозиторий
-git clone https://github.com/your-username/stockwise.git
+git clone https://github.com/Masachusets/stockwise.git
 cd stockwise
 
 # 2. Скачайте зависимости
