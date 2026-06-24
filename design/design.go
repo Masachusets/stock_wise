@@ -26,70 +26,72 @@ var _ = API("stockwise", func() {
 
 var Nomenclature = Type("Nomenclature", func() {
 	Description("Номенклатура")
-	Attribute("id", Int32, "Идентификатор")
 	Attribute("code", String, "Код номенклатуры", func() {
 		Example("08.01.02.00.00/0041")
 	})
 	Attribute("name", String, "Наименование", func() {
 		Example("Ноутбук Clevo 15\"")
 	})
-	Attribute("created_at", String, "Дата создания", func() {
-		Format(FormatDate)
-	})
-	Required("id", "code", "name")
+	Required("code", "name")
 })
 
-var Employee = Type("Employee", func() {
-	Description("Сотрудник")
-	Attribute("card_number", Int32, "Номер карточки (из КУ Ф-111)")
+var Card = Type("Card", func() {
+	Description("Карточка сотрудника")
+	Attribute("number", Int32, "Номер карточки (из КУ Ф-111)")
 	Attribute("full_name", String, "ФИО (без звания)", func() {
 		Example("Багликов А.С.")
 	})
-	Attribute("is_active", Boolean, "Активен", func() {
-		Default(true)
-	})
-	Attribute("created_at", String, "Дата создания", func() {
-		Format(FormatDate)
-	})
-	Required("card_number", "full_name")
+	Required("number", "full_name")
 })
 
 var Department = Type("Department", func() {
 	Description("Подразделение")
-	Attribute("id", Int32, "Идентификатор")
-	Attribute("code", String, "Код подразделения", func() {
-		Example("02/1")
+	Attribute("code", Int32, "Код подразделения", func() {
+		Example(100)
+	})
+	Attribute("type", String, "Тип подразделения", func() {
+		Enum("warehouse", "upogg", "opk", "pogk", "pogz")
 	})
 	Attribute("name", String, "Наименование", func() {
-		Example("Гомель ОПК")
+		Example("СКЛАД")
 	})
-	Attribute("is_active", Boolean, "Активно", func() {
-		Default(true)
+	Required("code", "type", "name")
+})
+
+var AssignmentInfo = Type("AssignmentInfo", func() {
+	Description("Информация о закреплении оборудования")
+	Attribute("target_type", String, "Тип закрепления", func() {
+		Enum("employee", "department", "warehouse")
 	})
-	Attribute("created_at", String, "Дата создания", func() {
+	Attribute("card_number", Int32, "Номер карточки сотрудника")
+	Attribute("full_name", String, "ФИО сотрудника", func() {
+		Example("Багликов А.С.")
+	})
+	Attribute("waybill_number", String, "Номер накладной", func() {
+		Example("ПОДР-100")
+	})
+	Attribute("waybill_date", String, "Дата накладной", func() {
 		Format(FormatDate)
 	})
-	Required("id", "code", "name")
+	Attribute("from_dept_name", String, "Подразделение-отправитель")
+	Attribute("to_dept_name", String, "Подразделение-получатель")
+	Attribute("operator_comment", String, "Комментарий оператора")
+	Required("target_type")
 })
 
 var Equipment = Type("Equipment", func() {
 	Description("Оборудование")
-	Attribute("id", Int32, "Идентификатор")
 	Attribute("inventory_number", String, "Инвентарный номер", func() {
 		Pattern("^ИТ\\d{5}$")
 		Example("ИТ00205")
 	})
 	Attribute("serial_number", String, "Заводской номер")
-	Attribute("mac_address", String, "MAC-адрес", func() {
-		Format(FormatMAC)
-	})
-	Attribute("nomenclature_id", Int32, "ID номенклатуры")
+	Attribute("nomenclature", Nomenclature, "Номенклатура")
 	Attribute("model_name", String, "Наименование модели", func() {
 		Example("Ноутбук Clevo 15\"")
 	})
-	Attribute("manufacture_year", Int32, "Год изготовления", func() {
-		Minimum(1990)
-		Maximum(2200)
+	Attribute("manufacture_date", String, "Дата изготовления", func() {
+		Format(FormatDate)
 	})
 	Attribute("arrival_date", String, "Дата поступления", func() {
 		Format(FormatDate)
@@ -102,127 +104,87 @@ var Equipment = Type("Equipment", func() {
 		Example("219")
 	})
 	Attribute("notes", String, "Примечания")
-	Attribute("nomenclature", Nomenclature, "Номенклатура (вложенная)")
-	Attribute("created_at", String, "Дата создания", func() {
-		Format(FormatDateTime)
-	})
-	Attribute("updated_at", String, "Дата обновления", func() {
-		Format(FormatDateTime)
-	})
-	Required("id", "inventory_number", "model_name", "status")
+	Attribute("assignment", AssignmentInfo, "Текущее закрепление")
+	Required("inventory_number", "model_name", "status")
 })
 
-var WaybillItem = Type("WaybillItem", func() {
-	Description("Позиция накладной")
+var WaybillsEquipment = Type("WaybillsEquipment", func() {
+	Description("Позиция накладной (связь накладной и оборудования)")
+	Attribute("waybill_id", Int32, "ID накладной")
 	Attribute("equipment_id", Int32, "ID оборудования")
-	Attribute("equipment", Equipment, "Оборудование (вложенное)")
-	Required("equipment_id")
+	Required("waybill_id", "equipment_id")
 })
 
 var Waybill = Type("Waybill", func() {
 	Description("Накладная")
-	Attribute("id", Int32, "Идентификатор")
 	Attribute("number", String, "Номер документа", func() {
 		Example("Накладная №123")
 	})
 	Attribute("issue_date", String, "Дата документа", func() {
 		Format(FormatDate)
 	})
+	Attribute("from_dept", Int32, "Код подразделения-отправителя")
+	Attribute("to_dept", Int32, "Код подразделения-получателя")
 	Attribute("status", String, "Статус", func() {
-		Enum("DRAFT", "SIGNED", "ARCHIVED")
+		Enum("draft", "signed", "archived")
 	})
-	Attribute("items", ArrayOf(WaybillItem), "Позиции накладной")
-	Attribute("created_at", String, "Дата создания", func() {
-		Format(FormatDateTime)
-	})
-	Required("id", "number", "issue_date", "status")
+	Attribute("items", ArrayOf(WaybillsEquipment), "Позиции накладной")
+	Required("number", "issue_date", "status")
 })
 
 var Assignment = Type("Assignment", func() {
-	Description("Закрепление оборудования")
-	Attribute("id", Int32, "Идентификатор")
-	Attribute("equipment_id", Int32, "ID оборудования")
+	Description("Запись закрепления оборудования (история)")
 	Attribute("target_type", String, "Тип закрепления", func() {
 		Enum("employee", "department", "warehouse")
 	})
-	Attribute("employee_id", Int32, "Номер карточки сотрудника")
-	Attribute("department_id", Int32, "ID подразделения")
-	Attribute("waybill_id", Int32, "ID накладной")
+	Attribute("card_number", Int32, "Номер карточки сотрудника")
+	Attribute("full_name", String, "ФИО сотрудника")
+	Attribute("waybill_number", String, "Номер накладной")
+	Attribute("waybill_date", String, "Дата накладной", func() {
+		Format(FormatDate)
+	})
+	Attribute("from_dept_name", String, "Подразделение-отправитель")
+	Attribute("to_dept_name", String, "Подразделение-получатель")
 	Attribute("assigned_at", String, "Дата закрепления", func() {
 		Format(FormatDateTime)
 	})
 	Attribute("unassigned_at", String, "Дата снятия", func() {
 		Format(FormatDateTime)
 	})
-	Attribute("is_active", Boolean, "Активно", func() {
-		Default(true)
-	})
 	Attribute("operator_comment", String, "Комментарий оператора")
-	Attribute("equipment", Equipment, "Оборудование (вложенное)")
-	Attribute("employee", Employee, "Сотрудник (вложенный)")
-	Attribute("department", Department, "Подразделение (вложенное)")
-	Required("id", "equipment_id", "target_type", "is_active")
+	Required("target_type", "assigned_at")
 })
 
 // ============================================================================
 // Payload типы
 // ============================================================================
 
-var CreateNomenclaturePayload = Type("CreateNomenclaturePayload", func() {
-	Description("Данные для создания номенклатуры")
-	Attribute("code", String, "Код номенклатуры")
-	Attribute("name", String, "Наименование")
-	Required("code", "name")
-})
-
-var UpdateNomenclaturePayload = Type("UpdateNomenclaturePayload", func() {
-	Description("Данные для обновления номенклатуры")
-	Attribute("id", Int32, "Идентификатор")
-	Attribute("code", String, "Код номенклатуры")
-	Attribute("name", String, "Наименование")
-	Required("id")
-})
-
-var CreateEmployeePayload = Type("CreateEmployeePayload", func() {
-	Description("Данные для создания сотрудника")
-	Attribute("card_number", Int32, "Номер карточки")
+var CreateCardPayload = Type("CreateCardPayload", func() {
+	Description("Данные для создания карточки")
+	Attribute("number", Int32, "Номер карточки")
 	Attribute("full_name", String, "ФИО")
-	Required("card_number", "full_name")
+	Required("number", "full_name")
 })
 
-var UpdateEmployeePayload = Type("UpdateEmployeePayload", func() {
-	Description("Данные для обновления сотрудника")
-	Attribute("card_number", Int32, "Номер карточки")
+var UpdateCardPayload = Type("UpdateCardPayload", func() {
+	Description("Данные для обновления карточки")
+	Attribute("number", Int32, "Номер карточки")
 	Attribute("full_name", String, "ФИО")
-	Attribute("is_active", Boolean, "Активен")
-	Required("card_number")
-})
-
-var CreateDepartmentPayload = Type("CreateDepartmentPayload", func() {
-	Description("Данные для создания подразделения")
-	Attribute("code", String, "Код подразделения")
-	Attribute("name", String, "Наименование")
-	Required("code", "name")
-})
-
-var UpdateDepartmentPayload = Type("UpdateDepartmentPayload", func() {
-	Description("Данные для обновления подразделения")
-	Attribute("id", Int32, "Идентификатор")
-	Attribute("code", String, "Код подразделения")
-	Attribute("name", String, "Наименование")
-	Attribute("is_active", Boolean, "Активно")
-	Required("id")
+	Required("number")
 })
 
 var CreateEquipmentPayload = Type("CreateEquipmentPayload", func() {
 	Description("Данные для создания оборудования")
 	Attribute("inventory_number", String, "Инвентарный номер")
 	Attribute("serial_number", String, "Заводской номер")
-	Attribute("mac_address", String, "MAC-адрес")
 	Attribute("nomenclature_id", Int32, "ID номенклатуры")
 	Attribute("model_name", String, "Наименование модели")
-	Attribute("manufacture_year", Int32, "Год изготовления")
-	Attribute("arrival_date", String, "Дата поступления")
+	Attribute("manufacture_date", String, "Дата изготовления", func() {
+		Format(FormatDate)
+	})
+	Attribute("arrival_date", String, "Дата поступления", func() {
+		Format(FormatDate)
+	})
 	Attribute("status", String, "Статус", func() {
 		Enum("exp", "exp_int", "exp_sp", "broken", "written_off")
 	})
@@ -234,39 +196,49 @@ var CreateEquipmentPayload = Type("CreateEquipmentPayload", func() {
 
 var UpdateEquipmentPayload = Type("UpdateEquipmentPayload", func() {
 	Description("Данные для обновления оборудования")
-	Attribute("id", Int32, "Идентификатор")
 	Attribute("inventory_number", String, "Инвентарный номер")
 	Attribute("serial_number", String, "Заводской номер")
-	Attribute("mac_address", String, "MAC-адрес")
 	Attribute("nomenclature_id", Int32, "ID номенклатуры")
 	Attribute("model_name", String, "Наименование модели")
-	Attribute("manufacture_year", Int32, "Год изготовления")
-	Attribute("arrival_date", String, "Дата поступления")
+	Attribute("manufacture_date", String, "Дата изготовления", func() {
+		Format(FormatDate)
+	})
+	Attribute("arrival_date", String, "Дата поступления", func() {
+		Format(FormatDate)
+	})
 	Attribute("status", String, "Статус", func() {
 		Enum("exp", "exp_int", "exp_sp", "broken", "written_off")
 	})
 	Attribute("form_number", String, "Номер формуляра")
 	Attribute("location", String, "Место установки")
 	Attribute("notes", String, "Примечания")
-	Required("id")
+	Required("inventory_number")
 })
 
 var CreateWaybillPayload = Type("CreateWaybillPayload", func() {
 	Description("Данные для создания накладной")
 	Attribute("number", String, "Номер документа")
-	Attribute("issue_date", String, "Дата документа")
-	Attribute("items", ArrayOf(WaybillItem), "Позиции накладной")
+	Attribute("issue_date", String, "Дата документа", func() {
+		Format(FormatDate)
+	})
+	Attribute("from_dept", Int32, "Код подразделения-отправителя")
+	Attribute("to_dept", Int32, "Код подразделения-получателя")
+	Attribute("items", ArrayOf(WaybillsEquipment), "Позиции накладной")
 	Required("number", "issue_date")
 })
+
+// ============================================================================
+// List типы
+// ============================================================================
 
 var NomenclatureList = Type("NomenclatureList", func() {
 	Attribute("nomenclatures", ArrayOf(Nomenclature))
 	Required("nomenclatures")
 })
 
-var EmployeeList = Type("EmployeeList", func() {
-	Attribute("employees", ArrayOf(Employee))
-	Required("employees")
+var CardList = Type("CardList", func() {
+	Attribute("cards", ArrayOf(Card))
+	Required("cards")
 })
 
 var DepartmentList = Type("DepartmentList", func() {
@@ -290,20 +262,19 @@ var AssignmentList = Type("AssignmentList", func() {
 })
 
 // ============================================================================
-// Services
+// Сервисы
 // ============================================================================
 
 var _ = Service("nomenclatures", func() {
-	Description("Справочник номенклатур")
+	Description("Справочник номенклатур (только чтение)")
 
 	Error("not_found", String, "Номенклатура не найдена")
-	Error("conflict", String, "Код номенклатуры уже существует")
 
 	Method("list", func() {
 		Description("Список всех номенклатур")
 		Result(NomenclatureList)
 		HTTP(func() {
-			GET("/nomenclatures")
+			GET("/dictionaries/nomenclatures")
 			Response(StatusOK)
 		})
 	})
@@ -317,184 +288,103 @@ var _ = Service("nomenclatures", func() {
 		Result(Nomenclature)
 		Error("not_found")
 		HTTP(func() {
-			GET("/nomenclatures/{id}")
+			GET("/dictionaries/nomenclatures/{id}")
 			Response(StatusOK)
-			Response("not_found", StatusNotFound)
-		})
-	})
-
-	Method("create", func() {
-		Description("Создать номенклатуру")
-		Payload(CreateNomenclaturePayload)
-		Result(Nomenclature)
-		Error("conflict")
-		HTTP(func() {
-			POST("/nomenclatures")
-			Response(StatusCreated)
-			Response("conflict", StatusConflict)
-		})
-	})
-
-	Method("update", func() {
-		Description("Обновить номенклатуру")
-		Payload(UpdateNomenclaturePayload)
-		Result(Nomenclature)
-		Error("not_found")
-		Error("conflict")
-		HTTP(func() {
-			PUT("/nomenclatures/{id}")
-			Response(StatusOK)
-			Response("not_found", StatusNotFound)
-			Response("conflict", StatusConflict)
-		})
-	})
-
-	Method("delete", func() {
-		Description("Удалить номенклатуру")
-		Payload(func() {
-			Attribute("id", Int32, "ID номенклатуры")
-			Required("id")
-		})
-		Error("not_found")
-		HTTP(func() {
-			DELETE("/nomenclatures/{id}")
-			Response(StatusNoContent)
-			Response("not_found", StatusNotFound)
-		})
-	})
-})
-
-var _ = Service("employees", func() {
-	Description("Справочник сотрудников")
-
-	Error("not_found", String, "Сотрудник не найден")
-
-	Method("list", func() {
-		Description("Список всех сотрудников")
-		Result(EmployeeList)
-		HTTP(func() {
-			GET("/employees")
-			Response(StatusOK)
-		})
-	})
-
-	Method("get", func() {
-		Description("Получить сотрудника по номеру карточки")
-		Payload(func() {
-			Attribute("card_number", Int32, "Номер карточки")
-			Required("card_number")
-		})
-		Result(Employee)
-		Error("not_found")
-		HTTP(func() {
-			GET("/employees/{card_number}")
-			Response(StatusOK)
-			Response("not_found", StatusNotFound)
-		})
-	})
-
-	Method("create", func() {
-		Description("Создать сотрудника")
-		Payload(CreateEmployeePayload)
-		Result(Employee)
-		HTTP(func() {
-			POST("/employees")
-			Response(StatusCreated)
-		})
-	})
-
-	Method("update", func() {
-		Description("Обновить сотрудника")
-		Payload(UpdateEmployeePayload)
-		Result(Employee)
-		Error("not_found")
-		HTTP(func() {
-			PUT("/employees/{card_number}")
-			Response(StatusOK)
-			Response("not_found", StatusNotFound)
-		})
-	})
-
-	Method("delete", func() {
-		Description("Удалить сотрудника")
-		Payload(func() {
-			Attribute("card_number", Int32, "Номер карточки")
-			Required("card_number")
-		})
-		Error("not_found")
-		HTTP(func() {
-			DELETE("/employees/{card_number}")
-			Response(StatusNoContent)
 			Response("not_found", StatusNotFound)
 		})
 	})
 })
 
 var _ = Service("departments", func() {
-	Description("Справочник подразделений")
+	Description("Справочник подразделений (только чтение)")
 
 	Error("not_found", String, "Подразделение не найдено")
-	Error("conflict", String, "Код подразделения уже существует")
 
 	Method("list", func() {
 		Description("Список всех подразделений")
 		Result(DepartmentList)
 		HTTP(func() {
-			GET("/departments")
+			GET("/dictionaries/departments")
 			Response(StatusOK)
 		})
 	})
 
 	Method("get", func() {
-		Description("Получить подразделение по ID")
+		Description("Получить подразделение по коду")
 		Payload(func() {
-			Attribute("id", Int32, "ID подразделения")
-			Required("id")
+			Attribute("code", Int32, "Код подразделения")
+			Required("code")
 		})
 		Result(Department)
 		Error("not_found")
 		HTTP(func() {
-			GET("/departments/{id}")
+			GET("/dictionaries/departments/{code}")
+			Response(StatusOK)
+			Response("not_found", StatusNotFound)
+		})
+	})
+})
+
+var _ = Service("cards", func() {
+	Description("Управление карточками сотрудников")
+
+	Error("not_found", String, "Карточка не найдена")
+
+	Method("list", func() {
+		Description("Список всех карточек")
+		Result(CardList)
+		HTTP(func() {
+			GET("/cards")
+			Response(StatusOK)
+		})
+	})
+
+	Method("get", func() {
+		Description("Получить карточку по номеру")
+		Payload(func() {
+			Attribute("number", Int32, "Номер карточки")
+			Required("number")
+		})
+		Result(Card)
+		Error("not_found")
+		HTTP(func() {
+			GET("/cards/{number}")
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
 		})
 	})
 
 	Method("create", func() {
-		Description("Создать подразделение")
-		Payload(CreateDepartmentPayload)
-		Result(Department)
-		Error("conflict")
+		Description("Создать карточку")
+		Payload(CreateCardPayload)
+		Result(Card)
 		HTTP(func() {
-			POST("/departments")
+			POST("/cards")
 			Response(StatusCreated)
-			Response("conflict", StatusConflict)
 		})
 	})
 
 	Method("update", func() {
-		Description("Обновить подразделение")
-		Payload(UpdateDepartmentPayload)
-		Result(Department)
+		Description("Обновить карточку")
+		Payload(UpdateCardPayload)
+		Result(Card)
 		Error("not_found")
-		Error("conflict")
 		HTTP(func() {
-			PUT("/departments/{id}")
+			PUT("/cards/{number}")
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
-			Response("conflict", StatusConflict)
 		})
 	})
 
 	Method("delete", func() {
-		Description("Удалить подразделение")
+		Description("Удалить карточку")
 		Payload(func() {
-			Attribute("id", Int32, "ID подразделения")
-			Required("id")
+			Attribute("number", Int32, "Номер карточки")
+			Required("number")
 		})
 		Error("not_found")
 		HTTP(func() {
-			DELETE("/departments/{id}")
+			DELETE("/cards/{number}")
 			Response(StatusNoContent)
 			Response("not_found", StatusNotFound)
 		})
@@ -529,15 +419,15 @@ var _ = Service("equipments", func() {
 	})
 
 	Method("get", func() {
-		Description("Получить оборудование по ID")
+		Description("Получить оборудование по инвентарному номеру (с закреплением)")
 		Payload(func() {
-			Attribute("id", Int32, "ID оборудования")
-			Required("id")
+			Attribute("inventory_number", String, "Инвентарный номер")
+			Required("inventory_number")
 		})
 		Result(Equipment)
 		Error("not_found")
 		HTTP(func() {
-			GET("/equipments/{id}")
+			GET("/equipments/{inventory_number}")
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
 		})
@@ -556,13 +446,13 @@ var _ = Service("equipments", func() {
 	})
 
 	Method("update", func() {
-		Description("Обновить оборудование")
+		Description("Обновить оборудование по инвентарному номеру")
 		Payload(UpdateEquipmentPayload)
 		Result(Equipment)
 		Error("not_found")
 		Error("conflict")
 		HTTP(func() {
-			PUT("/equipments/{id}")
+			PUT("/equipments/{inventory_number}")
 			Response(StatusOK)
 			Response("not_found", StatusNotFound)
 			Response("conflict", StatusConflict)
@@ -570,45 +460,15 @@ var _ = Service("equipments", func() {
 	})
 
 	Method("delete", func() {
-		Description("Удалить оборудование (soft delete)")
+		Description("Удалить оборудование (мягкое удаление)")
 		Payload(func() {
-			Attribute("id", Int32, "ID оборудования")
-			Required("id")
+			Attribute("inventory_number", String, "Инвентарный номер")
+			Required("inventory_number")
 		})
 		Error("not_found")
 		HTTP(func() {
-			DELETE("/equipments/{id}")
+			DELETE("/equipments/{inventory_number}")
 			Response(StatusNoContent)
-			Response("not_found", StatusNotFound)
-		})
-	})
-
-	Method("getAssignment", func() {
-		Description("Получить текущее закрепление оборудования")
-		Payload(func() {
-			Attribute("id", Int32, "ID оборудования")
-			Required("id")
-		})
-		Result(Assignment)
-		Error("not_found")
-		HTTP(func() {
-			GET("/equipments/{id}/assignment")
-			Response(StatusOK)
-			Response("not_found", StatusNotFound)
-		})
-	})
-
-	Method("getAssignmentList", func() {
-		Description("Получить историю закреплений оборудования")
-		Payload(func() {
-			Attribute("id", Int32, "ID оборудования")
-			Required("id")
-		})
-		Result(AssignmentList)
-		Error("not_found")
-		HTTP(func() {
-			GET("/equipments/{id}/assignments")
-			Response(StatusOK)
 			Response("not_found", StatusNotFound)
 		})
 	})
@@ -645,7 +505,7 @@ var _ = Service("waybills", func() {
 	})
 
 	Method("create", func() {
-		Description("Создать накладную (статус DRAFT)")
+		Description("Создать накладную (статус draft)")
 		Payload(CreateWaybillPayload)
 		Result(Waybill)
 		HTTP(func() {
@@ -655,7 +515,7 @@ var _ = Service("waybills", func() {
 	})
 
 	Method("sign", func() {
-		Description("Подписать накладную (DRAFT → SIGNED). Создаёт записи в equipments_assignments")
+		Description("Подписать накладную (draft → signed). Создаёт записи закреплений")
 		Payload(func() {
 			Attribute("id", Int32, "ID накладной")
 			Required("id")
@@ -672,7 +532,7 @@ var _ = Service("waybills", func() {
 	})
 
 	Method("archive", func() {
-		Description("Архивировать накладную (SIGNED → ARCHIVED)")
+		Description("Архивировать накладную (signed → archived)")
 		Payload(func() {
 			Attribute("id", Int32, "ID накладной")
 			Required("id")
@@ -689,7 +549,7 @@ var _ = Service("waybills", func() {
 	})
 
 	Method("delete", func() {
-		Description("Удалить накладную (только DRAFT)")
+		Description("Удалить накладную (только draft)")
 		Payload(func() {
 			Attribute("id", Int32, "ID накладной")
 			Required("id")
