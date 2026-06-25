@@ -37,4 +37,4 @@ go.work.sum
 excel/
 AGENTS.md
 bin/
-server
+/server

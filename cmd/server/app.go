@@ -33,6 +33,33 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
+// loggingHandler — HTTP-мидлвейнер для логирования запросов.
+type loggingHandler struct {
+	handler http.Handler
+}
+
+func (h *loggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	sw := &statusWriter{ResponseWriter: w, status: http.StatusOK}
+	h.handler.ServeHTTP(sw, r)
+	slog.Info("request",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"status", sw.status,
+		"duration", time.Since(start).String(),
+	)
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusWriter) WriteHeader(code int) {
+	w.status = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
 // runApp инициализирует и запускает HTTP-сервер StockWise.
 func runApp(cfg *config.Config) error {
 	// Настройка уровня логирования
@@ -119,7 +146,7 @@ func runApp(cfg *config.Config) error {
 	// Создание HTTP-сервера
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Port),
-		Handler:           mux,
+		Handler:           &loggingHandler{handler: mux},
 		ReadHeaderTimeout: 60 * time.Second,
 	}
 
