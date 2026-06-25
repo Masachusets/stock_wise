@@ -1,56 +1,106 @@
-# 🌐 StockWise
-🌍 [English](README.md) | 🇷🇺 **Русский** |
-📦 **Умный учёт материальных средств и инвентаря**
+# StockWise
 
-[![Go Version](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go)](https://go.dev/)
-[![License](https://img.shields.io/badge/Лицензия-MIT-blue.svg)](LICENSE)
-[![Build & Test](https://img.shields.io/github/actions/workflow/status/your-username/stockwise/ci.yml?label=сборка)](https://github.com/your-username/stockwise/actions)
+Система учёта оборудования и материальных средств для управления активами, закреплениями и перемещениями.
 
-## 📖 О проекте
-**StockWise** — приложение для отслеживания, классификации и управления материальными средствами, складскими остатками и основными фондами. Написано на **Go** для максимальной скорости, безопасности и лёгкости развёртывания. Подходит для малого бизнеса, складов, IT-отделов и любых команд, которым нужен прозрачный учёт ресурсов.
+## Технологический стек
 
-## ✨ Возможности
-- 🔍 **Отслеживание в реальном времени** — статус, местоположение и история перемещений каждого объекта
-<!-- - 📊 **Аналитика и отчёты** — наглядные дашборды, экспорт в CSV/PDF, KPI-показатели
-- 🏷️ **Поддержка штрих-кодов и QR** — быстрое сканирование, пакетная обработка и инвентаризация
-- 🔔 **Умные уведомления** — оповещения о низких остатках, истечении гарантий и плановом обслуживании
-- 👥 **Командная работа** — ролевая модель доступа, журнал действий, поддержка нескольких складов/локаций
-- 🐧 **Кроссплатформенность** — единый бинарник под Linux, Windows, macOS + REST API для интеграций
-- 🔒 **Безопасность** — JWT-аутентификация, шифрование данных, аудит-лог
--->
-## 🛠️ Технологический стек
-| Компонент       | Технология                                      |
-|-----------------|-------------------------------------------------|
-| Язык            | `Go 1.26+`                                      |
-| ORM / Запросы   | `GORM` / `sqlc` / `ent`                         |
-| База данных     | `PostgreSQL`                 |
-| Миграции        | `Goose` / `Go Migrate`                          |
-| Конфигурация    | `Viper` / `godotenv`                            |
-| Логирование     | `Zap` / `slog`                                  |
-| Сборка / CI/CD  | `Docker`, `GitHub Actions`, `Makefile`          |
+- **Язык**: Go 1.26+
+- **API-фреймворк**: [Goa v3](https://goa.design) — design-first, генерация кода
+- **База данных**: PostgreSQL 16 (через `jackc/pgx/v5`)
+- **Логирование**: `log/slog` (структурированные JSON-логи)
+- **Импорт Excel**: `xuri/excelize/v2`
+- **Инфраструктура**: Docker Compose (только PostgreSQL)
 
-## 🚀 Установка и запуск
+## Структура проекта
+
+```
+cmd/server/               # Точка входа HTTP-сервера
+cmd/import/               # CLI-утилита: массовый импорт из Excel в PostgreSQL
+internal/
+  config/                 # Конфигурация (флаги, переменные окружения)
+  nomenclatures/          # Справочник номенклатур (только чтение)
+  departments/            # Справочник подразделений (только чтение)
+  cards/                  # Карточки сотрудников (CRUD)
+  equipments/             # Оборудование (CRUD) с информацией о закреплении
+  waybills/               # Накладные (CRUD) + подписание/архивирование
+  assignments/            # История закреплений (только чтение)
+  importer/               # Логика импорта из Excel
+design/design.go          # Goa-дизайн API (источник истины)
+sql/create.sql            # Схема БД (DDL, ENUM, индексы)
+gen/                      # [gitignored] Сгенерированный Goa-код
+```
+
+## Быстрый старт
+
 ### Требования
-- [Go 1.21+](https://go.dev/dl/)
-- PostgreSQL 14+ *(или SQLite для локального теста)*
-- Docker & Docker Compose *(опционально, для быстрого развёртывания)*
+- Go 1.26+
+- Docker & Docker Compose
+- PostgreSQL 16 (через Docker)
 
-### Быстрый старт
+### Запуск
+
 ```bash
-# 1. Клонируйте репозиторий
-git clone https://github.com/Masachusets/stockwise.git
-cd stockwise
+# 1. Запустить PostgreSQL
+docker compose up -d
 
-# 2. Скачайте зависимости
-go mod download
-go mod tidy
+# 2. Импортировать данные из Excel
+go run ./cmd/import -db "postgres://stockwise:stockwise@localhost:5432/stockwise" -excel ./excel
 
-# 3. Настройте окружение
-cp .env.example .env
-# Отредактируйте .env: укажите адрес БД, порты, секреты и т.д.
+# 3. Запустить API-сервер
+go run ./cmd/server -db "postgres://stockwise:stockwise@localhost:5432/stockwise" -port 8080
+```
 
-# 4. Примените миграции БД
-make migrate-up   # или: goose -dir migrations postgres "your_db_url" up
+### Флаги сервера
 
-# 5. Запустите приложение
-go run .
+| Флаг   | По умолчанию                                             | Описание               |
+|--------|----------------------------------------------------------|------------------------|
+| `-db`  | `postgres://stockwise:stockwise@localhost:5432/stockwise` | Подключение к PostgreSQL |
+| `-port`| `8080`                                                   | HTTP-порт              |
+| `-log` | `info`                                                   | Уровень логирования (debug/info/warn/error) |
+
+## API-эндпоинты
+
+| Метод  | Путь                                | Описание                           |
+|--------|-------------------------------------|------------------------------------|
+| GET    | /dictionaries/nomenclatures         | Список номенклатур                 |
+| GET    | /dictionaries/nomenclatures/{id}    | Номенклатура по ID                 |
+| GET    | /dictionaries/departments           | Список подразделений               |
+| GET    | /dictionaries/departments/{code}    | Подразделение по коду              |
+| GET    | /cards                              | Список карточек                    |
+| GET    | /cards/{number}                     | Карточка по номеру                 |
+| POST   | /cards                              | Создать карточку                   |
+| PUT    | /cards/{number}                     | Обновить карточку                  |
+| DELETE | /cards/{number}                     | Удалить карточку                   |
+| GET    | /equipments                         | Список оборудования (с фильтрами) |
+| GET    | /equipments/{inventory_number}      | Оборудование с закреплением        |
+| POST   | /equipments                         | Создать оборудование               |
+| PUT    | /equipments/{inventory_number}      | Обновить оборудование              |
+| DELETE | /equipments/{inventory_number}      | Удалить оборудование (мягкое)      |
+| GET    | /waybills                           | Список накладных                   |
+| GET    | /waybills/{id}                      | Накладная с позициями              |
+| POST   | /waybills                           | Создать накладную                  |
+| POST   | /waybills/{id}/sign                 | Подписать (DRAFT→SIGNED)           |
+| POST   | /waybills/{id}/archive              | Архивировать (SIGNED→ARCHIVED)     |
+| DELETE | /waybills/{id}                      | Удалить накладную (только DRAFT)   |
+| GET    | /assignments                        | Список закреплений                 |
+| GET    | /assignments/{id}                   | Закрепление по ID                  |
+
+## Схема БД
+
+Основные таблицы:
+- `nomenclatures` — справочник номенклатур (код + наименование)
+- `cards` — карточки сотрудников (номер карточки как PK)
+- `departments` — подразделения (код INT как PK, тип enum)
+- `equipments` — оборудование (инвентарный номер `ИТ\d{5}`, мягкое удаление)
+- `waybills` — накладные (draft → signed → archived)
+- `waybills_equipments` — связь накладных и оборудования
+- `equipments_assignments` — история закреплений оборудования
+
+## Перегенерация кода
+
+После изменения `design/design.go`:
+
+```bash
+goa gen github.com/Masachusets/stock_wise/design
+go build ./cmd/server
+```

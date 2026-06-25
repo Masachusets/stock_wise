@@ -1,53 +1,106 @@
-# 🌐 StockWise
-🌍 **English** | 🇷🇺 [Русский](README.ru.md) |
-📦 **Smart Inventory & Material Resources Tracking**
+# StockWise
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/your-username/stockwise)](https://github.com/your-username/stockwise/releases)
-[![Build & Test](https://img.shields.io/github/actions/workflow/status/your-username/stockwise/ci.yml?label=build)](https://github.com/your-username/stockwise/actions)
+Equipment and inventory tracking system for managing material resources, fixed assets, and assignments.
 
-## 📖 About
-**StockWise** is a modern application for tracking and managing material resources, inventory, and fixed assets. Designed for small businesses, warehouses, and internal teams, it provides real-time visibility, automated alerts, and seamless cross-device synchronization — all in one intuitive interface.
+## Tech Stack
 
-## ✨ Features
-- 🔍 **Real-time Tracking** – Monitor stock levels, locations, and movement history
-<!-- - 📊 **Smart Dashboard** – Visual analytics, exportable reports & KPI tracking
-- 📱 **Cross-Platform** – Web, desktop & mobile apps with offline support
-- 🏷️ **Barcode/QR Scanning** – Fast item lookup & batch processing
-- 🔔 **Low-Stock Alerts** – Automated notifications & reorder suggestions
-- 👥 **Team Collaboration** – Role-based access, activity logs & multi-location support
-- ☁️ **Cloud Sync** – Secure backup & real-time data synchronization
--->
-## 🛠️ Tech Stack
-| Layer        | Technology                          |
-|--------------|-------------------------------------|
-| Frontend     | `React` / `Tailwind`                |
-| Backend      | `Go`                                |
-| Database     | `PostgreSQL`                        |
-| Deployment   | `Docker` / `GitHub Actions`         |
+- **Language**: Go 1.26+
+- **API Framework**: [Goa v3](https://goa.design) — design-first, code-generated
+- **Database**: PostgreSQL 16 (via `jackc/pgx/v5`)
+- **Logging**: `log/slog` (structured JSON logs)
+- **Excel Import**: `xuri/excelize/v2`
+- **Dev Infra**: Docker Compose (PostgreSQL only)
 
-## 🚀 Installation & Setup
+## Project Structure
+
+```
+cmd/server/               # HTTP server entry point
+cmd/import/               # CLI tool: bulk import from Excel to PostgreSQL
+internal/
+  config/                 # Configuration (flags, env)
+  nomenclatures/          # Read-only dictionary service
+  departments/            # Read-only dictionary service
+  cards/                  # Staff cards CRUD
+  equipments/             # Equipment CRUD with assignment info
+  waybills/               # Waybills CRUD + sign/archive lifecycle
+  assignments/            # Assignment history (read-only)
+  importer/               # Excel import logic
+design/design.go          # Goa API design (source of truth)
+sql/create.sql            # Database schema (DDL, ENUMs, indexes)
+gen/                      # [gitignored] Goa-generated code
+```
+
+## Quick Start
+
 ### Prerequisites
 - Go 1.26+
-- PostgreSQL / SQLite
-- Git
+- Docker & Docker Compose
+- PostgreSQL 16 (via Docker)
 
-### Quick Start
+### Run
+
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Masachusets/stockwise.git
-cd stockwise
+# 1. Start PostgreSQL
+docker compose up -d
 
-# 2. Install dependencies
-go mod download
-go mod tidy
+# 2. Import data from Excel
+go run ./cmd/import -db "postgres://stockwise:stockwise@localhost:5432/stockwise" -excel ./excel
 
-# 3. Configure environment variables
-cp .env.example .env
-# Edit .env with your database credentials, API keys, etc.
+# 3. Start the API server
+go run ./cmd/server -db "postgres://stockwise:stockwise@localhost:5432/stockwise" -port 8080
+```
 
-# 4. Run database migrations
-make migrate-up 
+### Server Flags
 
-# 5. Start the development server
-go run .
+| Flag   | Default                                                  | Description            |
+|--------|----------------------------------------------------------|------------------------|
+| `-db`  | `postgres://stockwise:stockwise@localhost:5432/stockwise` | PostgreSQL connection  |
+| `-port`| `8080`                                                   | HTTP port              |
+| `-log` | `info`                                                   | Log level (debug/info/warn/error) |
+
+## API Endpoints
+
+| Method | Path                                | Description                    |
+|--------|-------------------------------------|--------------------------------|
+| GET    | /dictionaries/nomenclatures         | List nomenclatures             |
+| GET    | /dictionaries/nomenclatures/{id}    | Get nomenclature by ID         |
+| GET    | /dictionaries/departments           | List departments               |
+| GET    | /dictionaries/departments/{code}    | Get department by code         |
+| GET    | /cards                              | List staff cards               |
+| GET    | /cards/{number}                     | Get card by number             |
+| POST   | /cards                              | Create card                    |
+| PUT    | /cards/{number}                     | Update card                    |
+| DELETE | /cards/{number}                     | Delete card                    |
+| GET    | /equipments                         | List equipments (with filters) |
+| GET    | /equipments/{inventory_number}      | Get equipment with assignment  |
+| POST   | /equipments                         | Create equipment               |
+| PUT    | /equipments/{inventory_number}      | Update equipment               |
+| DELETE | /equipments/{inventory_number}      | Delete equipment (soft)        |
+| GET    | /waybills                           | List waybills                  |
+| GET    | /waybills/{id}                      | Get waybill with items         |
+| POST   | /waybills                           | Create waybill                 |
+| POST   | /waybills/{id}/sign                 | Sign waybill (DRAFT→SIGNED)    |
+| POST   | /waybills/{id}/archive              | Archive waybill (SIGNED→ARCHIVED) |
+| DELETE | /waybills/{id}                      | Delete waybill (DRAFT only)    |
+| GET    | /assignments                        | List assignments               |
+| GET    | /assignments/{id}                   | Get assignment                 |
+
+## Database Schema
+
+Core tables:
+- `nomenclatures` — product catalog (code + name)
+- `cards` — staff (card_number as PK)
+- `departments` — organizational units (code INT as PK, type enum)
+- `equipments` — tracked equipment (inventory_number `ИТ\d{5}`, soft delete)
+- `waybills` — transfer documents (draft → signed → archived)
+- `waybills_equipments` — waybill-to-equipment binding
+- `equipments_assignments` — equipment-to-employee/department binding history
+
+## Regenerate Code
+
+After changing `design/design.go`:
+
+```bash
+goa gen github.com/Masachusets/stock_wise/design
+go build ./cmd/server
+```
