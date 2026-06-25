@@ -42,12 +42,30 @@ func (h *loggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	sw := &statusWriter{ResponseWriter: w, status: http.StatusOK}
 	h.handler.ServeHTTP(sw, r)
-	slog.Info("request",
-		"method", r.Method,
-		"path", r.URL.Path,
-		"status", sw.status,
-		"duration", time.Since(start).String(),
-	)
+	duration := time.Since(start).String()
+
+	if sw.status >= 500 {
+		slog.Error("request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"duration", duration,
+		)
+	} else if sw.status >= 400 {
+		slog.Warn("request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"duration", duration,
+		)
+	} else {
+		slog.Info("request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"duration", duration,
+		)
+	}
 }
 
 type statusWriter struct {
@@ -103,8 +121,9 @@ func runApp(cfg *config.Config) error {
 	mux := goahttp.NewMuxer()
 	dec := goahttp.RequestDecoder
 	enc := goahttp.ResponseEncoder
+	// Обработчик ошибок Goa — логирует ошибки с контекстом запроса
 	eh := func(ctx context.Context, w http.ResponseWriter, err error) {
-		slog.Error("request error", "error", err)
+		slog.Error("endpoint error", "error", err)
 	}
 
 	// Создание HTTP-хэндлеров
