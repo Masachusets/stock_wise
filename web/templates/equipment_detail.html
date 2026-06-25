@@ -1,0 +1,110 @@
+{{define "content"}}
+<h1>Оборудование {{.Equipment.InventoryNumber}}</h1>
+
+<a href="/equipments" class="back-link">← Назад к списку</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>{{.Equipment.ModelName}}</h2>
+        <span class="badge badge-{{.Equipment.Status}}">{{statusLabel .Equipment.Status}}</span>
+    </div>
+
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Инвентарный номер</label>
+                <span>{{.Equipment.InventoryNumber}}</span>
+            </div>
+            {{if .Equipment.SerialNumber}}
+            <div class="info-item">
+                <label>Заводской номер</label>
+                <span>{{.Equipment.SerialNumber}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.Nomenclature}}
+            <div class="info-item">
+                <label>Номенклатура</label>
+                <span>{{.Equipment.Nomenclature.Code}} — {{.Equipment.Nomenclature.Name}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.ManufactureDate}}
+            <div class="info-item">
+                <label>Дата изготовления</label>
+                <span>{{.Equipment.ManufactureDate}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.ArrivalDate}}
+            <div class="info-item">
+                <label>Дата поступления</label>
+                <span>{{.Equipment.ArrivalDate}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.FormNumber}}
+            <div class="info-item">
+                <label>№ формуляра</label>
+                <span>{{.Equipment.FormNumber}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.Location}}
+            <div class="info-item">
+                <label>Место установки</label>
+                <span>{{.Equipment.Location}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.Notes}}
+            <div class="info-item full-width">
+                <label>Примечания</label>
+                <span>{{.Equipment.Notes}}</span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+{{if .Equipment.Assignment}}
+<div class="card">
+    <div class="card-header">
+        <h2>Текущее закрепление</h2>
+        <span class="badge badge-{{.Equipment.Assignment.TargetType}}">{{targetLabel .Equipment.Assignment.TargetType}}</span>
+    </div>
+    <div class="card-body">
+        <div class="info-grid">
+            {{if eq .Equipment.Assignment.TargetType "employee"}}
+            <div class="info-item">
+                <label>Сотрудник</label>
+                <span>{{.Equipment.Assignment.FullName}}</span>
+            </div>
+            {{else if eq .Equipment.Assignment.TargetType "department"}}
+            <div class="info-item">
+                <label>Накладная</label>
+                <span>{{.Equipment.Assignment.WaybillNumber}}</span>
+            </div>
+            {{if .Equipment.Assignment.FromDeptName}}
+            <div class="info-item">
+                <label>Откуда</label>
+                <span>{{.Equipment.Assignment.FromDeptName}}</span>
+            </div>
+            {{end}}
+            {{if .Equipment.Assignment.ToDeptName}}
+            <div class="info-item">
+                <label>Куда</label>
+                <span>{{.Equipment.Assignment.ToDeptName}}</span>
+            </div>
+            {{end}}
+            {{else if eq .Equipment.Assignment.TargetType "warehouse"}}
+            <div class="info-item">
+                <label>Местоположение</label>
+                <span>На складе</span>
+            </div>
+            {{end}}
+            {{if .Equipment.Assignment.OperatorComment}}
+            <div class="info-item full-width">
+                <label>Комментарий</label>
+                <span>{{.Equipment.Assignment.OperatorComment}}</span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}
+{{end}}

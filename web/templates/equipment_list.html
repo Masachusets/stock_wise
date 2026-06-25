@@ -1,0 +1,52 @@
+{{define "content"}}
+<h1>Оборудование</h1>
+
+<div class="filters">
+    <input type="text" id="search" placeholder="Поиск по инв. номеру или модели..." oninput="filterTable()">
+    <select id="statusFilter" onchange="filterTable()">
+        <option value="">Все статусы</option>
+        <option value="exp">Эксплуатируемое</option>
+        <option value="exp_int">Эксплуатируемое (интернет)</option>
+        <option value="exp_sp">Эксплуатируемое (категорированное)</option>
+        <option value="broken">Неисправное</option>
+        <option value="written_off">Списанное</option>
+    </select>
+</div>
+
+<table id="equipmentTable">
+    <thead>
+        <tr>
+            <th>Инв. номер</th>
+            <th>Модель</th>
+            <th>Статус</th>
+            <th>Локация</th>
+            <th>Закрепление</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .Equipments}}
+        <tr onclick="window.location='/equipments/{{.InventoryNumber}}'" style="cursor:pointer">
+            <td><strong>{{.InventoryNumber}}</strong></td>
+            <td>{{.ModelName}}</td>
+            <td><span class="badge badge-{{.Status}}">{{statusLabel .Status}}</span></td>
+            <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
+            <td>
+                {{if .Assignment}}
+                    {{if eq .Assignment.TargetType "employee"}}
+                        👤 {{.Assignment.FullName}}
+                    {{else if eq .Assignment.TargetType "department"}}
+                        🏢 {{.Assignment.WaybillNumber}}
+                    {{else if eq .Assignment.TargetType "warehouse"}}
+                        📦 Склад
+                    {{end}}
+                {{else}}
+                    —
+                {{end}}
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+
+<div class="info">Всего: {{len .Equipments}} единиц</div>
+{{end}}

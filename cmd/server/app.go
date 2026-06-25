@@ -163,9 +163,18 @@ func runApp(cfg *config.Config) error {
 	}
 
 	// Создание HTTP-сервера
+	rootMux := http.NewServeMux()
+
+	// Регистрация веб-хэндлеров (шаблоны + статика)
+	tpl := loadTemplates()
+	registerWebHandlers(rootMux, tpl, equipmentsSvc, waybillsSvc)
+
+	// Монтирование API-хэндлеров на /api/
+	rootMux.Handle("/api/", http.StripPrefix("/api", mux))
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Port),
-		Handler:           &loggingHandler{handler: mux},
+		Handler:           &loggingHandler{handler: rootMux},
 		ReadHeaderTimeout: 60 * time.Second,
 	}
 
