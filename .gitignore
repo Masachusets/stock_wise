@@ -36,3 +36,5 @@ go.work.sum
 # Others
 excel/
 AGENTS.md
+bin/
+server
