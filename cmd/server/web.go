@@ -179,12 +179,12 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			return
 		}
 
-		// Получить оборудование по накладной
-		eqRows, err := pool.Query(r.Context(), `SELECT e.inventory_number, COALESCE(e.model_name, ''), n.name
-		FROM waybills_equipments we
-		JOIN equipments e ON we.equipment_id = e.id
+		// Получить оборудование по накладной (через equipments_assignments)
+		eqRows, err := pool.Query(r.Context(), `SELECT DISTINCT e.inventory_number, COALESCE(e.model_name, ''), n.name
+		FROM equipments_assignments a
+		JOIN equipments e ON a.equipment_id = e.id
 		LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
-		WHERE we.waybill_id = $1`, id)
+		WHERE a.waybill_id = $1`, id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -199,9 +199,16 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 		var equipments []eqItem
 		for eqRows.Next() {
 			var item eqItem
-			if err := eqRows.Scan(&item.InventoryNumber, &item.ModelName, &item.Nomenclature); err != nil {
+			var modelName, nomenclature interface{}
+			if err := eqRows.Scan(&item.InventoryNumber, &modelName, &nomenclature); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
+			}
+			if modelName != nil {
+				item.ModelName = fmt.Sprintf("%v", modelName)
+			}
+			if nomenclature != nil {
+				item.Nomenclature = fmt.Sprintf("%v", nomenclature)
 			}
 			equipments = append(equipments, item)
 		}
