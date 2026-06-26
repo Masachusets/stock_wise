@@ -5,88 +5,80 @@ import (
 	"fmt"
 
 	gen "github.com/Masachusets/stock_wise/gen/waybills"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type service struct {
-	db *pgxpool.Pool
+	repo Repository
 }
 
-func New(db *pgxpool.Pool) gen.Service {
-	return &service{db: db}
+func New(repo Repository) gen.Service {
+	return &service{repo: repo}
 }
 
 func (s *service) List(ctx context.Context) (res *gen.WaybillList, err error) {
-	rows, err := s.db.Query(ctx, "SELECT id, number, issue_date::text, from_dept, to_dept, status FROM waybills WHERE deleted_at IS NULL ORDER BY issue_date DESC")
+	items, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	var waybills []*gen.Waybill
-	for rows.Next() {
-		w := &gen.Waybill{}
-		var id int32
-		if err := rows.Scan(&id, &w.Number, &w.IssueDate, &w.FromDept, &w.ToDept, &w.Status); err != nil {
-			return nil, err
-		}
-		waybills = append(waybills, w)
+	for _, w := range items {
+		waybills = append(waybills, &gen.Waybill{
+			Number:    w.Number,
+			IssueDate: w.IssueDate,
+			FromDept:  w.FromDept,
+			ToDept:    w.ToDept,
+			Status:    w.Status,
+		})
 	}
 	return &gen.WaybillList{Waybills: waybills}, nil
 }
 
 func (s *service) Get(ctx context.Context, p *gen.GetPayload) (res *gen.Waybill, err error) {
-	res = &gen.Waybill{}
-	err = s.db.QueryRow(ctx, "SELECT number, issue_date::text, from_dept, to_dept, status FROM waybills WHERE id = $1", p.ID).Scan(&res.Number, &res.IssueDate, &res.FromDept, &res.ToDept, &res.Status)
+	w, err := s.repo.Get(ctx, p.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := s.db.Query(ctx, "SELECT waybill_id, equipment_id FROM waybills_equipments WHERE waybill_id = $1", p.ID)
-	if err != nil {
-		return nil, err
+	res = &gen.Waybill{
+		Number:    w.Number,
+		IssueDate: w.IssueDate,
+		FromDept:  w.FromDept,
+		ToDept:    w.ToDept,
+		Status:    w.Status,
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		we := &gen.WaybillsEquipment{}
-		if err := rows.Scan(&we.WaybillID, &we.EquipmentID); err != nil {
-			return nil, err
-		}
-		res.Items = append(res.Items, we)
+	for _, item := range w.Items {
+		res.Items = append(res.Items, &gen.WaybillsEquipment{
+			WaybillID:   item.WaybillID,
+			EquipmentID: item.EquipmentID,
+		})
 	}
-	return
+	return res, nil
 }
 
 func (s *service) Create(ctx context.Context, p *gen.CreateWaybillPayload) (res *gen.Waybill, err error) {
-	var id int32
-	err = s.db.QueryRow(ctx,
-		"INSERT INTO waybills (number, issue_date, from_dept, to_dept) VALUES ($1, $2, $3, $4) RETURNING id",
-		p.Number, p.IssueDate, p.FromDept, p.ToDept,
-	).Scan(&id)
-	if err != nil {
+	wb := &Waybill{
+		Number:    p.Number,
+		IssueDate: p.IssueDate,
+		FromDept:  p.FromDept,
+		ToDept:    p.ToDept,
+	}
+	for _, item := range p.Items {
+		wb.Items = append(wb.Items, &WaybillsEquipment{
+			EquipmentID: item.EquipmentID,
+		})
+	}
+
+	if err := s.repo.Create(ctx, wb); err != nil {
 		return nil, err
 	}
 
-	for _, item := range p.Items {
-		_, err = s.db.Exec(ctx, "INSERT INTO waybills_equipments (waybill_id, equipment_id) VALUES ($1, $2)", id, item.EquipmentID)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return s.Get(ctx, &gen.GetPayload{ID: id})
+	return s.Get(ctx, &gen.GetPayload{ID: wb.ID})
 }
 
 func (s *service) Sign(ctx context.Context, p *gen.SignPayload) (res *gen.Waybill, err error) {
-	tx, err := s.db.Begin(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback(ctx)
-
-	var status string
-	err = tx.QueryRow(ctx, "SELECT status FROM waybills WHERE id = $1 FOR UPDATE", p.ID).Scan(&status)
+	status, err := s.repo.GetStatus(ctx, p.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,40 +86,25 @@ func (s *service) Sign(ctx context.Context, p *gen.SignPayload) (res *gen.Waybil
 		return nil, gen.InvalidStatus(fmt.Sprintf("нельзя подписать накладную со статусом %s", status))
 	}
 
-	_, err = tx.Exec(ctx, "UPDATE waybills SET status = 'signed' WHERE id = $1", p.ID)
+	if err := s.repo.UpdateStatus(ctx, p.ID, "signed"); err != nil {
+		return nil, err
+	}
+
+	eqIDs, err := s.repo.GetEquipmentIDs(ctx, p.ID)
 	if err != nil {
 		return nil, err
 	}
-
-	rows, err := tx.Query(ctx, "SELECT equipment_id FROM waybills_equipments WHERE waybill_id = $1", p.ID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var eqID int32
-		if err := rows.Scan(&eqID); err != nil {
+	for _, eqID := range eqIDs {
+		if err := s.repo.CreateAssignment(ctx, eqID, p.ID); err != nil {
 			return nil, err
 		}
-		_, err = tx.Exec(ctx,
-			`INSERT INTO equipments_assignments (equipment_id, target_type, waybill_id)
-			 VALUES ($1, 'department', $2)`, eqID, p.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return nil, err
 	}
 
 	return s.Get(ctx, &gen.GetPayload{ID: p.ID})
 }
 
 func (s *service) Archive(ctx context.Context, p *gen.ArchivePayload) (res *gen.Waybill, err error) {
-	var status string
-	err = s.db.QueryRow(ctx, "SELECT status FROM waybills WHERE id = $1", p.ID).Scan(&status)
+	status, err := s.repo.GetStatus(ctx, p.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +112,7 @@ func (s *service) Archive(ctx context.Context, p *gen.ArchivePayload) (res *gen.
 		return nil, gen.InvalidStatus(fmt.Sprintf("нельзя архивировать накладную со статусом %s", status))
 	}
 
-	_, err = s.db.Exec(ctx, "UPDATE waybills SET status = 'archived' WHERE id = $1", p.ID)
-	if err != nil {
+	if err := s.repo.UpdateStatus(ctx, p.ID, "archived"); err != nil {
 		return nil, err
 	}
 
@@ -144,8 +120,7 @@ func (s *service) Archive(ctx context.Context, p *gen.ArchivePayload) (res *gen.
 }
 
 func (s *service) Delete(ctx context.Context, p *gen.DeletePayload) error {
-	var status string
-	err := s.db.QueryRow(ctx, "SELECT status FROM waybills WHERE id = $1", p.ID).Scan(&status)
+	status, err := s.repo.GetStatus(ctx, p.ID)
 	if err != nil {
 		return err
 	}
@@ -153,6 +128,5 @@ func (s *service) Delete(ctx context.Context, p *gen.DeletePayload) error {
 		return gen.InvalidStatus(fmt.Sprintf("нельзя удалить накладную со статусом %s", status))
 	}
 
-	_, err = s.db.Exec(ctx, "DELETE FROM waybills WHERE id = $1", p.ID)
-	return err
+	return s.repo.Delete(ctx, p.ID)
 }
