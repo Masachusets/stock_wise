@@ -103,7 +103,8 @@ func runApp(cfg *config.Config) error {
 
 	// Создание сервисов (internal/*)
 	nomenclaturesSvc := svcnomenclatures.New(pool)
-	departmentsSvc := svcdepartments.New(pool)
+	departmentsRepo := svcdepartments.NewPostgresRepository(pool)
+	departmentsSvc := svcdepartments.New(departmentsRepo)
 	cardsSvc := svccards.New(pool)
 	equipmentsSvc := svcequipments.New(pool)
 	waybillsSvc := svcwaybills.New(pool)
