@@ -1,0 +1,2011 @@
+openapi: 3.0.3
+info:
+    title: StockWise API
+    description: Учёт материальных средств и оборудования
+    version: 1.0.0
+servers:
+    - url: http://localhost:8080
+paths:
+    /assignments:
+        get:
+            tags:
+                - assignments
+            summary: list assignments
+            description: Список закреплений с фильтрацией
+            operationId: assignments#list
+            parameters:
+                - name: equipment_id
+                  in: query
+                  description: Фильтр по оборудованию
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: Фильтр по оборудованию
+                    example: 856480498
+                    format: int32
+                  example: 627877167
+                - name: is_active
+                  in: query
+                  description: Фильтр по активности
+                  allowEmptyValue: true
+                  schema:
+                    type: boolean
+                    description: Фильтр по активности
+                    example: true
+                  example: true
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssignmentList'
+                            example:
+                                assignments:
+                                    - assigned_at: "2002-06-24T20:29:45Z"
+                                      card_number: 716412898
+                                      from_dept_name: Consequatur qui praesentium est.
+                                      full_name: Aut et nisi id qui qui exercitationem.
+                                      operator_comment: Quam rerum corrupti.
+                                      target_type: department
+                                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
+                                      unassigned_at: "2010-07-15T12:58:12Z"
+                                      waybill_date: "1989-08-24"
+                                      waybill_number: Illum ut non eaque.
+                                    - assigned_at: "2002-06-24T20:29:45Z"
+                                      card_number: 716412898
+                                      from_dept_name: Consequatur qui praesentium est.
+                                      full_name: Aut et nisi id qui qui exercitationem.
+                                      operator_comment: Quam rerum corrupti.
+                                      target_type: department
+                                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
+                                      unassigned_at: "2010-07-15T12:58:12Z"
+                                      waybill_date: "1989-08-24"
+                                      waybill_number: Illum ut non eaque.
+                                    - assigned_at: "2002-06-24T20:29:45Z"
+                                      card_number: 716412898
+                                      from_dept_name: Consequatur qui praesentium est.
+                                      full_name: Aut et nisi id qui qui exercitationem.
+                                      operator_comment: Quam rerum corrupti.
+                                      target_type: department
+                                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
+                                      unassigned_at: "2010-07-15T12:58:12Z"
+                                      waybill_date: "1989-08-24"
+                                      waybill_number: Illum ut non eaque.
+                                    - assigned_at: "2002-06-24T20:29:45Z"
+                                      card_number: 716412898
+                                      from_dept_name: Consequatur qui praesentium est.
+                                      full_name: Aut et nisi id qui qui exercitationem.
+                                      operator_comment: Quam rerum corrupti.
+                                      target_type: department
+                                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
+                                      unassigned_at: "2010-07-15T12:58:12Z"
+                                      waybill_date: "1989-08-24"
+                                      waybill_number: Illum ut non eaque.
+    /assignments/{id}:
+        get:
+            tags:
+                - assignments
+            summary: get assignments
+            description: Получить закрепление по ID
+            operationId: assignments#get
+            parameters:
+                - name: id
+                  in: path
+                  description: ID закрепления
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID закрепления
+                    example: 1447853923
+                    format: int32
+                  example: 1570997216
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Assignment'
+                            example:
+                                assigned_at: "2013-04-12T05:59:18Z"
+                                card_number: 1923891871
+                                from_dept_name: Dignissimos doloremque debitis et dolores incidunt.
+                                full_name: Mollitia est aspernatur id possimus sit voluptas.
+                                operator_comment: Est omnis excepturi impedit.
+                                target_type: department
+                                to_dept_name: Facere molestias voluptas explicabo ut.
+                                unassigned_at: "1991-05-23T04:48:33Z"
+                                waybill_date: "1991-03-18"
+                                waybill_number: Similique dolores aspernatur.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /cards:
+        get:
+            tags:
+                - cards
+            summary: list cards
+            description: Список всех карточек
+            operationId: cards#list
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CardList'
+                            example:
+                                cards:
+                                    - full_name: Багликов А.С.
+                                      number: 1731280678
+                                    - full_name: Багликов А.С.
+                                      number: 1731280678
+        post:
+            tags:
+                - cards
+            summary: create cards
+            description: Создать карточку
+            operationId: cards#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateCardPayload'
+                        example:
+                            full_name: Veniam officiis mollitia fugiat voluptatem numquam tempore.
+                            number: 110122744
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Card'
+                            example:
+                                full_name: Багликов А.С.
+                                number: 270050057
+    /cards/{number}:
+        delete:
+            tags:
+                - cards
+            summary: delete cards
+            description: Удалить карточку
+            operationId: cards#delete
+            parameters:
+                - name: number
+                  in: path
+                  description: Номер карточки
+                  required: true
+                  schema:
+                    type: integer
+                    description: Номер карточки
+                    example: 538835428
+                    format: int32
+                  example: 92041041
+            responses:
+                "204":
+                    description: No Content response.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        get:
+            tags:
+                - cards
+            summary: get cards
+            description: Получить карточку по номеру
+            operationId: cards#get
+            parameters:
+                - name: number
+                  in: path
+                  description: Номер карточки
+                  required: true
+                  schema:
+                    type: integer
+                    description: Номер карточки
+                    example: 2068017510
+                    format: int32
+                  example: 589879417
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Card'
+                            example:
+                                full_name: Багликов А.С.
+                                number: 236746536
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        put:
+            tags:
+                - cards
+            summary: update cards
+            description: Обновить карточку
+            operationId: cards#update
+            parameters:
+                - name: number
+                  in: path
+                  description: Номер карточки
+                  required: true
+                  schema:
+                    type: integer
+                    description: Номер карточки
+                    example: 527485240
+                    format: int32
+                  example: 701059577
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateCardPayload2'
+                        example:
+                            full_name: Quo veniam.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Card'
+                            example:
+                                full_name: Багликов А.С.
+                                number: 567146664
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /dictionaries/departments:
+        get:
+            tags:
+                - departments
+            summary: list departments
+            description: Список всех подразделений
+            operationId: departments#list
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DepartmentList'
+                            example:
+                                departments:
+                                    - code: 100
+                                      name: СКЛАД
+                                      type: opk
+                                    - code: 100
+                                      name: СКЛАД
+                                      type: opk
+    /dictionaries/departments/{code}:
+        get:
+            tags:
+                - departments
+            summary: get departments
+            description: Получить подразделение по коду
+            operationId: departments#get
+            parameters:
+                - name: code
+                  in: path
+                  description: Код подразделения
+                  required: true
+                  schema:
+                    type: integer
+                    description: Код подразделения
+                    example: 2137022739
+                    format: int32
+                  example: 18328401
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Department'
+                            example:
+                                code: 100
+                                name: СКЛАД
+                                type: pogk
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /dictionaries/nomenclatures:
+        get:
+            tags:
+                - nomenclatures
+            summary: list nomenclatures
+            description: Список всех номенклатур
+            operationId: nomenclatures#list
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NomenclatureList'
+                            example:
+                                nomenclatures:
+                                    - code: 08.01.02.00.00/0041
+                                      name: Ноутбук Clevo 15"
+                                    - code: 08.01.02.00.00/0041
+                                      name: Ноутбук Clevo 15"
+                                    - code: 08.01.02.00.00/0041
+                                      name: Ноутбук Clevo 15"
+                                    - code: 08.01.02.00.00/0041
+                                      name: Ноутбук Clevo 15"
+    /dictionaries/nomenclatures/{id}:
+        get:
+            tags:
+                - nomenclatures
+            summary: get nomenclatures
+            description: Получить номенклатуру по ID
+            operationId: nomenclatures#get
+            parameters:
+                - name: id
+                  in: path
+                  description: ID номенклатуры
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID номенклатуры
+                    example: 1450768322
+                    format: int32
+                  example: 861887179
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Nomenclature'
+                            example:
+                                code: 08.01.02.00.00/0041
+                                name: Ноутбук Clevo 15"
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /equipments:
+        get:
+            tags:
+                - equipments
+            summary: list equipments
+            description: Список оборудования с фильтрацией
+            operationId: equipments#list
+            parameters:
+                - name: status
+                  in: query
+                  description: Фильтр по статусу
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: Фильтр по статусу
+                    example: exp_sp
+                    enum:
+                        - exp
+                        - exp_int
+                        - exp_sp
+                        - broken
+                        - written_off
+                  example: broken
+                - name: nomenclature_id
+                  in: query
+                  description: Фильтр по номенклатуре
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: Фильтр по номенклатуре
+                    example: 1661554001
+                    format: int32
+                  example: 1978555598
+                - name: location
+                  in: query
+                  description: Фильтр по местоположению
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: Фильтр по местоположению
+                    example: Quod autem sunt aut asperiores earum sint.
+                  example: Delectus veritatis ut voluptatem asperiores deserunt harum.
+                - name: search
+                  in: query
+                  description: Поиск по наименованию/модели/серийнику
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: Поиск по наименованию/модели/серийнику
+                    example: Est natus nisi.
+                  example: Nobis et assumenda voluptas laborum aspernatur eligendi.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EquipmentList'
+                            example:
+                                equipments:
+                                    - arrival_date: "2002-11-13"
+                                      assignment:
+                                        card_number: 523417916
+                                        from_dept_name: Deserunt et quia.
+                                        full_name: Багликов А.С.
+                                        operator_comment: Qui non qui aliquam.
+                                        target_type: warehouse
+                                        to_dept_name: Alias maiores.
+                                        waybill_date: "2011-12-26"
+                                        waybill_number: ПОДР-100
+                                      form_number: Assumenda voluptatibus expedita.
+                                      inventory_number: ИТ00205
+                                      location: "219"
+                                      manufacture_date: "2013-12-23"
+                                      model_name: Ноутбук Clevo 15"
+                                      nomenclature:
+                                        code: 08.01.02.00.00/0041
+                                        name: Ноутбук Clevo 15"
+                                      notes: Placeat at.
+                                      serial_number: Ut qui nemo et excepturi nostrum.
+                                      status: exp_sp
+                                    - arrival_date: "2002-11-13"
+                                      assignment:
+                                        card_number: 523417916
+                                        from_dept_name: Deserunt et quia.
+                                        full_name: Багликов А.С.
+                                        operator_comment: Qui non qui aliquam.
+                                        target_type: warehouse
+                                        to_dept_name: Alias maiores.
+                                        waybill_date: "2011-12-26"
+                                        waybill_number: ПОДР-100
+                                      form_number: Assumenda voluptatibus expedita.
+                                      inventory_number: ИТ00205
+                                      location: "219"
+                                      manufacture_date: "2013-12-23"
+                                      model_name: Ноутбук Clevo 15"
+                                      nomenclature:
+                                        code: 08.01.02.00.00/0041
+                                        name: Ноутбук Clevo 15"
+                                      notes: Placeat at.
+                                      serial_number: Ut qui nemo et excepturi nostrum.
+                                      status: exp_sp
+                                    - arrival_date: "2002-11-13"
+                                      assignment:
+                                        card_number: 523417916
+                                        from_dept_name: Deserunt et quia.
+                                        full_name: Багликов А.С.
+                                        operator_comment: Qui non qui aliquam.
+                                        target_type: warehouse
+                                        to_dept_name: Alias maiores.
+                                        waybill_date: "2011-12-26"
+                                        waybill_number: ПОДР-100
+                                      form_number: Assumenda voluptatibus expedita.
+                                      inventory_number: ИТ00205
+                                      location: "219"
+                                      manufacture_date: "2013-12-23"
+                                      model_name: Ноутбук Clevo 15"
+                                      nomenclature:
+                                        code: 08.01.02.00.00/0041
+                                        name: Ноутбук Clevo 15"
+                                      notes: Placeat at.
+                                      serial_number: Ut qui nemo et excepturi nostrum.
+                                      status: exp_sp
+        post:
+            tags:
+                - equipments
+            summary: create equipments
+            description: Создать оборудование
+            operationId: equipments#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateEquipmentPayload'
+                        example:
+                            arrival_date: "2009-04-15"
+                            form_number: Repellat quisquam voluptatem iure et.
+                            inventory_number: At corporis corrupti eum et.
+                            location: Accusantium ipsam et ab animi harum.
+                            manufacture_date: "1984-02-05"
+                            model_name: Sint tempora occaecati.
+                            nomenclature_id: 1255132092
+                            notes: Saepe facere ex explicabo.
+                            serial_number: Ex dicta qui asperiores quam.
+                            status: exp
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Equipment'
+                            example:
+                                arrival_date: "1988-07-25"
+                                assignment:
+                                    card_number: 523417916
+                                    from_dept_name: Deserunt et quia.
+                                    full_name: Багликов А.С.
+                                    operator_comment: Qui non qui aliquam.
+                                    target_type: warehouse
+                                    to_dept_name: Alias maiores.
+                                    waybill_date: "2011-12-26"
+                                    waybill_number: ПОДР-100
+                                form_number: Vel veritatis dolore eveniet veniam.
+                                inventory_number: ИТ00205
+                                location: "219"
+                                manufacture_date: "1983-12-06"
+                                model_name: Ноутбук Clevo 15"
+                                nomenclature:
+                                    code: 08.01.02.00.00/0041
+                                    name: Ноутбук Clevo 15"
+                                notes: Deserunt sed quia.
+                                serial_number: Dignissimos assumenda nam et molestiae nostrum.
+                                status: exp
+                "409":
+                    description: 'conflict: Conflict response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /equipments/{inventory_number}:
+        delete:
+            tags:
+                - equipments
+            summary: delete equipments
+            description: Удалить оборудование (мягкое удаление)
+            operationId: equipments#delete
+            parameters:
+                - name: inventory_number
+                  in: path
+                  description: Инвентарный номер
+                  required: true
+                  schema:
+                    type: string
+                    description: Инвентарный номер
+                    example: Quos ipsum totam.
+                  example: Quaerat omnis expedita autem est est explicabo.
+            responses:
+                "204":
+                    description: No Content response.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        get:
+            tags:
+                - equipments
+            summary: get equipments
+            description: Получить оборудование по инвентарному номеру (с закреплением)
+            operationId: equipments#get
+            parameters:
+                - name: inventory_number
+                  in: path
+                  description: Инвентарный номер
+                  required: true
+                  schema:
+                    type: string
+                    description: Инвентарный номер
+                    example: Maiores earum distinctio omnis quos tempore qui.
+                  example: Doloremque molestias omnis et ex eos quam.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Equipment'
+                            example:
+                                arrival_date: "1973-06-12"
+                                assignment:
+                                    card_number: 523417916
+                                    from_dept_name: Deserunt et quia.
+                                    full_name: Багликов А.С.
+                                    operator_comment: Qui non qui aliquam.
+                                    target_type: warehouse
+                                    to_dept_name: Alias maiores.
+                                    waybill_date: "2011-12-26"
+                                    waybill_number: ПОДР-100
+                                form_number: Labore ullam voluptas modi laboriosam.
+                                inventory_number: ИТ00205
+                                location: "219"
+                                manufacture_date: "2012-11-12"
+                                model_name: Ноутбук Clevo 15"
+                                nomenclature:
+                                    code: 08.01.02.00.00/0041
+                                    name: Ноутбук Clevo 15"
+                                notes: Consequatur quisquam aut temporibus.
+                                serial_number: Ratione aut aspernatur qui quis et quo.
+                                status: broken
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        put:
+            tags:
+                - equipments
+            summary: update equipments
+            description: Обновить оборудование по инвентарному номеру
+            operationId: equipments#update
+            parameters:
+                - name: inventory_number
+                  in: path
+                  description: Инвентарный номер
+                  required: true
+                  schema:
+                    type: string
+                    description: Инвентарный номер
+                    example: At quibusdam vitae.
+                  example: Ut consequuntur recusandae quia.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateEquipmentPayload2'
+                        example:
+                            arrival_date: "1977-04-05"
+                            form_number: Perspiciatis optio et vel temporibus.
+                            location: Ullam illo.
+                            manufacture_date: "1994-09-05"
+                            model_name: Dolores aliquam nihil repudiandae natus harum fugit.
+                            nomenclature_id: 1387246062
+                            notes: Ab a odit aliquam praesentium.
+                            serial_number: Velit asperiores molestias autem.
+                            status: exp_sp
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Equipment'
+                            example:
+                                arrival_date: "2003-10-17"
+                                assignment:
+                                    card_number: 523417916
+                                    from_dept_name: Deserunt et quia.
+                                    full_name: Багликов А.С.
+                                    operator_comment: Qui non qui aliquam.
+                                    target_type: warehouse
+                                    to_dept_name: Alias maiores.
+                                    waybill_date: "2011-12-26"
+                                    waybill_number: ПОДР-100
+                                form_number: Dolores expedita nulla eum quos.
+                                inventory_number: ИТ00205
+                                location: "219"
+                                manufacture_date: "1987-12-11"
+                                model_name: Ноутбук Clevo 15"
+                                nomenclature:
+                                    code: 08.01.02.00.00/0041
+                                    name: Ноутбук Clevo 15"
+                                notes: Nobis enim aut accusamus optio atque non.
+                                serial_number: Qui magni maxime.
+                                status: exp
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "409":
+                    description: 'conflict: Conflict response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /waybills:
+        get:
+            tags:
+                - waybills
+            summary: list waybills
+            description: Список накладных
+            operationId: waybills#list
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WaybillList'
+                            example:
+                                waybills:
+                                    - from_dept: 1225071720
+                                      issue_date: "1994-12-14"
+                                      items:
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                      number: Накладная №123
+                                      status: archived
+                                      to_dept: 629113946
+                                    - from_dept: 1225071720
+                                      issue_date: "1994-12-14"
+                                      items:
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                        - equipment_id: 390105049
+                                          waybill_id: 1752360764
+                                      number: Накладная №123
+                                      status: archived
+                                      to_dept: 629113946
+        post:
+            tags:
+                - waybills
+            summary: create waybills
+            description: Создать накладную (статус draft)
+            operationId: waybills#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateWaybillPayload'
+                        example:
+                            from_dept: 1322191570
+                            issue_date: "1984-10-23"
+                            items:
+                                - equipment_id: 1042284240
+                                  waybill_id: 1023275452
+                                - equipment_id: 1042284240
+                                  waybill_id: 1023275452
+                                - equipment_id: 1042284240
+                                  waybill_id: 1023275452
+                            number: Ab et dolorem doloremque placeat sequi consequatur.
+                            to_dept: 1683165996
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Waybill'
+                            example:
+                                from_dept: 810455132
+                                issue_date: "1987-07-20"
+                                items:
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                number: Накладная №123
+                                status: archived
+                                to_dept: 559535940
+    /waybills/{id}:
+        delete:
+            tags:
+                - waybills
+            summary: delete waybills
+            description: Удалить накладную (только draft)
+            operationId: waybills#delete
+            parameters:
+                - name: id
+                  in: path
+                  description: ID накладной
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID накладной
+                    example: 1087966437
+                    format: int32
+                  example: 1720225457
+            responses:
+                "204":
+                    description: No Content response.
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "409":
+                    description: 'invalid_status: Conflict response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        get:
+            tags:
+                - waybills
+            summary: get waybills
+            description: Получить накладную по ID (с позициями)
+            operationId: waybills#get
+            parameters:
+                - name: id
+                  in: path
+                  description: ID накладной
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID накладной
+                    example: 1209603215
+                    format: int32
+                  example: 1892394701
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Waybill'
+                            example:
+                                from_dept: 55369251
+                                issue_date: "2011-06-09"
+                                items:
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                number: Накладная №123
+                                status: draft
+                                to_dept: 1079327504
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /waybills/{id}/archive:
+        post:
+            tags:
+                - waybills
+            summary: archive waybills
+            description: Архивировать накладную (signed → archived)
+            operationId: waybills#archive
+            parameters:
+                - name: id
+                  in: path
+                  description: ID накладной
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID накладной
+                    example: 110797600
+                    format: int32
+                  example: 2041845958
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Waybill'
+                            example:
+                                from_dept: 572340774
+                                issue_date: "1995-01-04"
+                                items:
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                number: Накладная №123
+                                status: signed
+                                to_dept: 179615372
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "409":
+                    description: 'invalid_status: Conflict response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /waybills/{id}/sign:
+        post:
+            tags:
+                - waybills
+            summary: sign waybills
+            description: Подписать накладную (draft → signed). Создаёт записи закреплений
+            operationId: waybills#sign
+            parameters:
+                - name: id
+                  in: path
+                  description: ID накладной
+                  required: true
+                  schema:
+                    type: integer
+                    description: ID накладной
+                    example: 985137189
+                    format: int32
+                  example: 1922464196
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Waybill'
+                            example:
+                                from_dept: 230518078
+                                issue_date: "1994-03-17"
+                                items:
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                    - equipment_id: 390105049
+                                      waybill_id: 1752360764
+                                number: Накладная №123
+                                status: signed
+                                to_dept: 1720354215
+                "404":
+                    description: 'not_found: Not Found response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "409":
+                    description: 'invalid_status: Conflict response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+components:
+    schemas:
+        Assignment:
+            type: object
+            properties:
+                assigned_at:
+                    type: string
+                    description: Дата закрепления
+                    example: "1985-03-29T11:34:17Z"
+                    format: date-time
+                card_number:
+                    type: integer
+                    description: Номер карточки сотрудника
+                    example: 2084183321
+                    format: int32
+                from_dept_name:
+                    type: string
+                    description: Подразделение-отправитель
+                    example: Perferendis numquam quod nam.
+                full_name:
+                    type: string
+                    description: ФИО сотрудника
+                    example: Sit dolores sit.
+                operator_comment:
+                    type: string
+                    description: Комментарий оператора
+                    example: Hic non accusamus minima dolorum totam officiis.
+                target_type:
+                    type: string
+                    description: Тип закрепления
+                    example: employee
+                    enum:
+                        - employee
+                        - department
+                        - warehouse
+                to_dept_name:
+                    type: string
+                    description: Подразделение-получатель
+                    example: Reprehenderit alias provident est voluptas commodi.
+                unassigned_at:
+                    type: string
+                    description: Дата снятия
+                    example: "1975-08-22T19:40:19Z"
+                    format: date-time
+                waybill_date:
+                    type: string
+                    description: Дата накладной
+                    example: "1985-02-22"
+                    format: date
+                waybill_number:
+                    type: string
+                    description: Номер накладной
+                    example: Nihil facere eum eum autem qui ab.
+            description: Запись закрепления оборудования (история)
+            example:
+                assigned_at: "2007-10-16T09:40:59Z"
+                card_number: 2014817234
+                from_dept_name: Et eos eligendi animi.
+                full_name: Eum aut sed reprehenderit aliquam aut.
+                operator_comment: Laboriosam quasi assumenda unde ut possimus.
+                target_type: warehouse
+                to_dept_name: Consequatur ex in ut quia natus nihil.
+                unassigned_at: "1975-06-05T13:43:18Z"
+                waybill_date: "1986-04-11"
+                waybill_number: Mollitia ut.
+            required:
+                - target_type
+                - assigned_at
+        AssignmentInfo:
+            type: object
+            properties:
+                card_number:
+                    type: integer
+                    description: Номер карточки сотрудника
+                    example: 97719870
+                    format: int32
+                from_dept_name:
+                    type: string
+                    description: Подразделение-отправитель
+                    example: Consequuntur expedita ipsum doloribus.
+                full_name:
+                    type: string
+                    description: ФИО сотрудника
+                    example: Багликов А.С.
+                operator_comment:
+                    type: string
+                    description: Комментарий оператора
+                    example: Ab nisi reprehenderit nihil blanditiis officiis sunt.
+                target_type:
+                    type: string
+                    description: Тип закрепления
+                    example: employee
+                    enum:
+                        - employee
+                        - department
+                        - warehouse
+                to_dept_name:
+                    type: string
+                    description: Подразделение-получатель
+                    example: Voluptas accusantium.
+                waybill_date:
+                    type: string
+                    description: Дата накладной
+                    example: "2005-04-10"
+                    format: date
+                waybill_number:
+                    type: string
+                    description: Номер накладной
+                    example: ПОДР-100
+            description: Информация о закреплении оборудования
+            example:
+                card_number: 1314566048
+                from_dept_name: Nisi cum.
+                full_name: Багликов А.С.
+                operator_comment: Dicta vel nobis ullam.
+                target_type: warehouse
+                to_dept_name: Eligendi et qui culpa unde mollitia.
+                waybill_date: "1993-06-07"
+                waybill_number: ПОДР-100
+            required:
+                - target_type
+        AssignmentList:
+            type: object
+            properties:
+                assignments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Assignment'
+                    example:
+                        - assigned_at: "1996-06-22T18:55:57Z"
+                          card_number: 1377221330
+                          from_dept_name: Iusto vel qui tenetur.
+                          full_name: Necessitatibus perspiciatis.
+                          operator_comment: Aperiam est voluptatem eum.
+                          target_type: warehouse
+                          to_dept_name: Et voluptatibus.
+                          unassigned_at: "1984-06-29T22:45:32Z"
+                          waybill_date: "1981-07-29"
+                          waybill_number: Molestiae dolores.
+                        - assigned_at: "1996-06-22T18:55:57Z"
+                          card_number: 1377221330
+                          from_dept_name: Iusto vel qui tenetur.
+                          full_name: Necessitatibus perspiciatis.
+                          operator_comment: Aperiam est voluptatem eum.
+                          target_type: warehouse
+                          to_dept_name: Et voluptatibus.
+                          unassigned_at: "1984-06-29T22:45:32Z"
+                          waybill_date: "1981-07-29"
+                          waybill_number: Molestiae dolores.
+                        - assigned_at: "1996-06-22T18:55:57Z"
+                          card_number: 1377221330
+                          from_dept_name: Iusto vel qui tenetur.
+                          full_name: Necessitatibus perspiciatis.
+                          operator_comment: Aperiam est voluptatem eum.
+                          target_type: warehouse
+                          to_dept_name: Et voluptatibus.
+                          unassigned_at: "1984-06-29T22:45:32Z"
+                          waybill_date: "1981-07-29"
+                          waybill_number: Molestiae dolores.
+                        - assigned_at: "1996-06-22T18:55:57Z"
+                          card_number: 1377221330
+                          from_dept_name: Iusto vel qui tenetur.
+                          full_name: Necessitatibus perspiciatis.
+                          operator_comment: Aperiam est voluptatem eum.
+                          target_type: warehouse
+                          to_dept_name: Et voluptatibus.
+                          unassigned_at: "1984-06-29T22:45:32Z"
+                          waybill_date: "1981-07-29"
+                          waybill_number: Molestiae dolores.
+            example:
+                assignments:
+                    - assigned_at: "1996-06-22T18:55:57Z"
+                      card_number: 1377221330
+                      from_dept_name: Iusto vel qui tenetur.
+                      full_name: Necessitatibus perspiciatis.
+                      operator_comment: Aperiam est voluptatem eum.
+                      target_type: warehouse
+                      to_dept_name: Et voluptatibus.
+                      unassigned_at: "1984-06-29T22:45:32Z"
+                      waybill_date: "1981-07-29"
+                      waybill_number: Molestiae dolores.
+                    - assigned_at: "1996-06-22T18:55:57Z"
+                      card_number: 1377221330
+                      from_dept_name: Iusto vel qui tenetur.
+                      full_name: Necessitatibus perspiciatis.
+                      operator_comment: Aperiam est voluptatem eum.
+                      target_type: warehouse
+                      to_dept_name: Et voluptatibus.
+                      unassigned_at: "1984-06-29T22:45:32Z"
+                      waybill_date: "1981-07-29"
+                      waybill_number: Molestiae dolores.
+                    - assigned_at: "1996-06-22T18:55:57Z"
+                      card_number: 1377221330
+                      from_dept_name: Iusto vel qui tenetur.
+                      full_name: Necessitatibus perspiciatis.
+                      operator_comment: Aperiam est voluptatem eum.
+                      target_type: warehouse
+                      to_dept_name: Et voluptatibus.
+                      unassigned_at: "1984-06-29T22:45:32Z"
+                      waybill_date: "1981-07-29"
+                      waybill_number: Molestiae dolores.
+            required:
+                - assignments
+        Card:
+            type: object
+            properties:
+                full_name:
+                    type: string
+                    description: ФИО (без звания)
+                    example: Багликов А.С.
+                number:
+                    type: integer
+                    description: Номер карточки (из КУ Ф-111)
+                    example: 1643864501
+                    format: int32
+            description: Карточка сотрудника
+            example:
+                full_name: Багликов А.С.
+                number: 900719590
+            required:
+                - number
+                - full_name
+        CardList:
+            type: object
+            properties:
+                cards:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Card'
+                    example:
+                        - full_name: Багликов А.С.
+                          number: 571623128
+                        - full_name: Багликов А.С.
+                          number: 571623128
+            example:
+                cards:
+                    - full_name: Багликов А.С.
+                      number: 571623128
+                    - full_name: Багликов А.С.
+                      number: 571623128
+            required:
+                - cards
+        CreateCardPayload:
+            type: object
+            properties:
+                full_name:
+                    type: string
+                    description: ФИО
+                    example: Laudantium saepe repellendus est minima est ducimus.
+                number:
+                    type: integer
+                    description: Номер карточки
+                    example: 62447832
+                    format: int32
+            description: Данные для создания карточки
+            example:
+                full_name: Praesentium sit.
+                number: 676329103
+            required:
+                - number
+                - full_name
+        CreateEquipmentPayload:
+            type: object
+            properties:
+                arrival_date:
+                    type: string
+                    description: Дата поступления
+                    example: "1985-12-27"
+                    format: date
+                form_number:
+                    type: string
+                    description: Номер формуляра
+                    example: Voluptatibus repellat.
+                inventory_number:
+                    type: string
+                    description: Инвентарный номер
+                    example: Libero necessitatibus ut et minus aliquid quos.
+                location:
+                    type: string
+                    description: Место установки
+                    example: Fugit et alias modi dolores magnam.
+                manufacture_date:
+                    type: string
+                    description: Дата изготовления
+                    example: "1990-08-23"
+                    format: date
+                model_name:
+                    type: string
+                    description: Наименование модели
+                    example: Non in.
+                nomenclature_id:
+                    type: integer
+                    description: ID номенклатуры
+                    example: 824983579
+                    format: int32
+                notes:
+                    type: string
+                    description: Примечания
+                    example: Minima magni tenetur assumenda quos.
+                serial_number:
+                    type: string
+                    description: Заводской номер
+                    example: Maiores harum libero.
+                status:
+                    type: string
+                    description: Статус
+                    example: exp_sp
+                    enum:
+                        - exp
+                        - exp_int
+                        - exp_sp
+                        - broken
+                        - written_off
+            description: Данные для создания оборудования
+            example:
+                arrival_date: "1987-03-13"
+                form_number: Rerum omnis quia ut veniam.
+                inventory_number: Doloremque quis adipisci sapiente sapiente quis magni.
+                location: Sit magnam quos.
+                manufacture_date: "1978-07-06"
+                model_name: Amet officia dicta qui perferendis.
+                nomenclature_id: 198471831
+                notes: Et laborum ducimus aliquam ipsam recusandae.
+                serial_number: Consectetur atque ut.
+                status: exp
+            required:
+                - inventory_number
+                - model_name
+                - status
+        CreateWaybillPayload:
+            type: object
+            properties:
+                from_dept:
+                    type: integer
+                    description: Код подразделения-отправителя
+                    example: 2134270565
+                    format: int32
+                issue_date:
+                    type: string
+                    description: Дата документа
+                    example: "1990-02-17"
+                    format: date
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WaybillsEquipment'
+                    description: Позиции накладной
+                    example:
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                number:
+                    type: string
+                    description: Номер документа
+                    example: Ut est eos.
+                to_dept:
+                    type: integer
+                    description: Код подразделения-получателя
+                    example: 1805894256
+                    format: int32
+            description: Данные для создания накладной
+            example:
+                from_dept: 609035564
+                issue_date: "1975-07-19"
+                items:
+                    - equipment_id: 906761579
+                      waybill_id: 241130727
+                    - equipment_id: 906761579
+                      waybill_id: 241130727
+                    - equipment_id: 906761579
+                      waybill_id: 241130727
+                number: Voluptatem rerum.
+                to_dept: 938877007
+            required:
+                - number
+                - issue_date
+        Department:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: Код подразделения
+                    example: 100
+                    format: int32
+                name:
+                    type: string
+                    description: Наименование
+                    example: СКЛАД
+                type:
+                    type: string
+                    description: Тип подразделения
+                    example: warehouse
+                    enum:
+                        - warehouse
+                        - upogg
+                        - opk
+                        - pogk
+                        - pogz
+            description: Подразделение
+            example:
+                code: 100
+                name: СКЛАД
+                type: warehouse
+            required:
+                - code
+                - type
+                - name
+        DepartmentList:
+            type: object
+            properties:
+                departments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Department'
+                    example:
+                        - code: 100
+                          name: СКЛАД
+                          type: warehouse
+                        - code: 100
+                          name: СКЛАД
+                          type: warehouse
+            example:
+                departments:
+                    - code: 100
+                      name: СКЛАД
+                      type: warehouse
+                    - code: 100
+                      name: СКЛАД
+                      type: warehouse
+                    - code: 100
+                      name: СКЛАД
+                      type: warehouse
+            required:
+                - departments
+        Equipment:
+            type: object
+            properties:
+                arrival_date:
+                    type: string
+                    description: Дата поступления
+                    example: "1971-10-07"
+                    format: date
+                assignment:
+                    $ref: '#/components/schemas/AssignmentInfo'
+                form_number:
+                    type: string
+                    description: Номер формуляра
+                    example: Non doloremque ut ab inventore.
+                inventory_number:
+                    type: string
+                    description: Инвентарный номер
+                    example: ИТ00205
+                    pattern: ^ИТ\d{5}$
+                location:
+                    type: string
+                    description: Место установки
+                    example: "219"
+                manufacture_date:
+                    type: string
+                    description: Дата изготовления
+                    example: "1993-07-27"
+                    format: date
+                model_name:
+                    type: string
+                    description: Наименование модели
+                    example: Ноутбук Clevo 15"
+                nomenclature:
+                    $ref: '#/components/schemas/Nomenclature'
+                notes:
+                    type: string
+                    description: Примечания
+                    example: Et et.
+                serial_number:
+                    type: string
+                    description: Заводской номер
+                    example: Ad expedita reprehenderit possimus.
+                status:
+                    type: string
+                    description: Статус
+                    example: exp_sp
+                    enum:
+                        - exp
+                        - exp_int
+                        - exp_sp
+                        - broken
+                        - written_off
+            description: Оборудование
+            example:
+                arrival_date: "1976-06-25"
+                assignment:
+                    card_number: 1831360969
+                    from_dept_name: Hic suscipit eaque natus vero cum.
+                    full_name: Багликов А.С.
+                    operator_comment: Consequatur voluptatum facilis.
+                    target_type: warehouse
+                    to_dept_name: Sed temporibus quo dolorum.
+                    waybill_date: "2013-01-22"
+                    waybill_number: ПОДР-100
+                form_number: Illo id ut non.
+                inventory_number: ИТ00205
+                location: "219"
+                manufacture_date: "2004-07-28"
+                model_name: Ноутбук Clevo 15"
+                nomenclature:
+                    code: 08.01.02.00.00/0041
+                    name: Ноутбук Clevo 15"
+                notes: Nobis assumenda rerum quod et sunt modi.
+                serial_number: Esse et beatae id id nisi.
+                status: exp
+            required:
+                - inventory_number
+                - model_name
+                - status
+        EquipmentList:
+            type: object
+            properties:
+                equipments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Equipment'
+                    example:
+                        - arrival_date: "1983-03-15"
+                          assignment:
+                            card_number: 1831360969
+                            from_dept_name: Hic suscipit eaque natus vero cum.
+                            full_name: Багликов А.С.
+                            operator_comment: Consequatur voluptatum facilis.
+                            target_type: warehouse
+                            to_dept_name: Sed temporibus quo dolorum.
+                            waybill_date: "2013-01-22"
+                            waybill_number: ПОДР-100
+                          form_number: Aut omnis ut vel neque non illum.
+                          inventory_number: ИТ00205
+                          location: "219"
+                          manufacture_date: "1973-08-20"
+                          model_name: Ноутбук Clevo 15"
+                          nomenclature:
+                            code: 08.01.02.00.00/0041
+                            name: Ноутбук Clevo 15"
+                          notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                          serial_number: Sed enim.
+                          status: written_off
+                        - arrival_date: "1983-03-15"
+                          assignment:
+                            card_number: 1831360969
+                            from_dept_name: Hic suscipit eaque natus vero cum.
+                            full_name: Багликов А.С.
+                            operator_comment: Consequatur voluptatum facilis.
+                            target_type: warehouse
+                            to_dept_name: Sed temporibus quo dolorum.
+                            waybill_date: "2013-01-22"
+                            waybill_number: ПОДР-100
+                          form_number: Aut omnis ut vel neque non illum.
+                          inventory_number: ИТ00205
+                          location: "219"
+                          manufacture_date: "1973-08-20"
+                          model_name: Ноутбук Clevo 15"
+                          nomenclature:
+                            code: 08.01.02.00.00/0041
+                            name: Ноутбук Clevo 15"
+                          notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                          serial_number: Sed enim.
+                          status: written_off
+                        - arrival_date: "1983-03-15"
+                          assignment:
+                            card_number: 1831360969
+                            from_dept_name: Hic suscipit eaque natus vero cum.
+                            full_name: Багликов А.С.
+                            operator_comment: Consequatur voluptatum facilis.
+                            target_type: warehouse
+                            to_dept_name: Sed temporibus quo dolorum.
+                            waybill_date: "2013-01-22"
+                            waybill_number: ПОДР-100
+                          form_number: Aut omnis ut vel neque non illum.
+                          inventory_number: ИТ00205
+                          location: "219"
+                          manufacture_date: "1973-08-20"
+                          model_name: Ноутбук Clevo 15"
+                          nomenclature:
+                            code: 08.01.02.00.00/0041
+                            name: Ноутбук Clevo 15"
+                          notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                          serial_number: Sed enim.
+                          status: written_off
+            example:
+                equipments:
+                    - arrival_date: "1983-03-15"
+                      assignment:
+                        card_number: 1831360969
+                        from_dept_name: Hic suscipit eaque natus vero cum.
+                        full_name: Багликов А.С.
+                        operator_comment: Consequatur voluptatum facilis.
+                        target_type: warehouse
+                        to_dept_name: Sed temporibus quo dolorum.
+                        waybill_date: "2013-01-22"
+                        waybill_number: ПОДР-100
+                      form_number: Aut omnis ut vel neque non illum.
+                      inventory_number: ИТ00205
+                      location: "219"
+                      manufacture_date: "1973-08-20"
+                      model_name: Ноутбук Clevo 15"
+                      nomenclature:
+                        code: 08.01.02.00.00/0041
+                        name: Ноутбук Clevo 15"
+                      notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                      serial_number: Sed enim.
+                      status: written_off
+                    - arrival_date: "1983-03-15"
+                      assignment:
+                        card_number: 1831360969
+                        from_dept_name: Hic suscipit eaque natus vero cum.
+                        full_name: Багликов А.С.
+                        operator_comment: Consequatur voluptatum facilis.
+                        target_type: warehouse
+                        to_dept_name: Sed temporibus quo dolorum.
+                        waybill_date: "2013-01-22"
+                        waybill_number: ПОДР-100
+                      form_number: Aut omnis ut vel neque non illum.
+                      inventory_number: ИТ00205
+                      location: "219"
+                      manufacture_date: "1973-08-20"
+                      model_name: Ноутбук Clevo 15"
+                      nomenclature:
+                        code: 08.01.02.00.00/0041
+                        name: Ноутбук Clevo 15"
+                      notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                      serial_number: Sed enim.
+                      status: written_off
+                    - arrival_date: "1983-03-15"
+                      assignment:
+                        card_number: 1831360969
+                        from_dept_name: Hic suscipit eaque natus vero cum.
+                        full_name: Багликов А.С.
+                        operator_comment: Consequatur voluptatum facilis.
+                        target_type: warehouse
+                        to_dept_name: Sed temporibus quo dolorum.
+                        waybill_date: "2013-01-22"
+                        waybill_number: ПОДР-100
+                      form_number: Aut omnis ut vel neque non illum.
+                      inventory_number: ИТ00205
+                      location: "219"
+                      manufacture_date: "1973-08-20"
+                      model_name: Ноутбук Clevo 15"
+                      nomenclature:
+                        code: 08.01.02.00.00/0041
+                        name: Ноутбук Clevo 15"
+                      notes: Asperiores ratione omnis qui consectetur laborum praesentium.
+                      serial_number: Sed enim.
+                      status: written_off
+            required:
+                - equipments
+        Error:
+            type: object
+            properties:
+                fault:
+                    type: boolean
+                    description: Is the error a server-side fault?
+                    example: false
+                id:
+                    type: string
+                    description: ID is a unique identifier for this particular occurrence of the problem.
+                    example: 123abc
+                message:
+                    type: string
+                    description: Message is a human-readable explanation specific to this occurrence of the problem.
+                    example: parameter 'p' must be an integer
+                name:
+                    type: string
+                    description: Name is the name of this class of errors.
+                    example: bad_request
+                temporary:
+                    type: boolean
+                    description: Is the error temporary?
+                    example: true
+                timeout:
+                    type: boolean
+                    description: Is the error a timeout?
+                    example: false
+            example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
+                timeout: true
+            required:
+                - name
+                - id
+                - message
+                - temporary
+                - timeout
+                - fault
+        Nomenclature:
+            type: object
+            properties:
+                code:
+                    type: string
+                    description: Код номенклатуры
+                    example: 08.01.02.00.00/0041
+                name:
+                    type: string
+                    description: Наименование
+                    example: Ноутбук Clevo 15"
+            description: Номенклатура
+            example:
+                code: 08.01.02.00.00/0041
+                name: Ноутбук Clevo 15"
+            required:
+                - code
+                - name
+        NomenclatureList:
+            type: object
+            properties:
+                nomenclatures:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Nomenclature'
+                    example:
+                        - code: 08.01.02.00.00/0041
+                          name: Ноутбук Clevo 15"
+                        - code: 08.01.02.00.00/0041
+                          name: Ноутбук Clevo 15"
+                        - code: 08.01.02.00.00/0041
+                          name: Ноутбук Clevo 15"
+                        - code: 08.01.02.00.00/0041
+                          name: Ноутбук Clevo 15"
+            example:
+                nomenclatures:
+                    - code: 08.01.02.00.00/0041
+                      name: Ноутбук Clevo 15"
+                    - code: 08.01.02.00.00/0041
+                      name: Ноутбук Clevo 15"
+                    - code: 08.01.02.00.00/0041
+                      name: Ноутбук Clevo 15"
+            required:
+                - nomenclatures
+        UpdateCardPayload:
+            type: object
+            properties:
+                full_name:
+                    type: string
+                    description: ФИО
+                    example: Impedit et neque porro sit.
+                number:
+                    type: integer
+                    description: Номер карточки
+                    example: 1501719248
+                    format: int32
+            description: Данные для обновления карточки
+            example:
+                full_name: Iste dicta.
+                number: 853375909
+            required:
+                - number
+        UpdateCardPayload2:
+            type: object
+            properties:
+                full_name:
+                    type: string
+                    description: ФИО
+                    example: Sint magnam blanditiis alias.
+            example:
+                full_name: Sed excepturi dolore voluptatem earum.
+        UpdateEquipmentPayload:
+            type: object
+            properties:
+                arrival_date:
+                    type: string
+                    description: Дата поступления
+                    example: "1980-07-26"
+                    format: date
+                form_number:
+                    type: string
+                    description: Номер формуляра
+                    example: Eveniet est maxime et nam odit aut.
+                inventory_number:
+                    type: string
+                    description: Инвентарный номер
+                    example: Hic minus magni aut harum at excepturi.
+                location:
+                    type: string
+                    description: Место установки
+                    example: Eum consequatur.
+                manufacture_date:
+                    type: string
+                    description: Дата изготовления
+                    example: "1985-05-16"
+                    format: date
+                model_name:
+                    type: string
+                    description: Наименование модели
+                    example: Commodi et at voluptatem vitae.
+                nomenclature_id:
+                    type: integer
+                    description: ID номенклатуры
+                    example: 1251035475
+                    format: int32
+                notes:
+                    type: string
+                    description: Примечания
+                    example: Commodi accusantium et cupiditate architecto qui.
+                serial_number:
+                    type: string
+                    description: Заводской номер
+                    example: Dolorem ut ipsa eaque neque itaque.
+                status:
+                    type: string
+                    description: Статус
+                    example: written_off
+                    enum:
+                        - exp
+                        - exp_int
+                        - exp_sp
+                        - broken
+                        - written_off
+            description: Данные для обновления оборудования
+            example:
+                arrival_date: "1976-12-08"
+                form_number: Voluptatem explicabo.
+                inventory_number: Libero sunt voluptatem rerum.
+                location: Similique dolores nostrum.
+                manufacture_date: "1982-09-15"
+                model_name: Ab aut ut omnis in esse et.
+                nomenclature_id: 1764085746
+                notes: Repellat incidunt.
+                serial_number: Quos debitis quia est voluptatem.
+                status: written_off
+            required:
+                - inventory_number
+        UpdateEquipmentPayload2:
+            type: object
+            properties:
+                arrival_date:
+                    type: string
+                    description: Дата поступления
+                    example: "1987-07-29"
+                    format: date
+                form_number:
+                    type: string
+                    description: Номер формуляра
+                    example: Voluptatem autem et id non et voluptas.
+                location:
+                    type: string
+                    description: Место установки
+                    example: Recusandae sapiente quam ut quia.
+                manufacture_date:
+                    type: string
+                    description: Дата изготовления
+                    example: "1982-08-01"
+                    format: date
+                model_name:
+                    type: string
+                    description: Наименование модели
+                    example: Doloremque quidem voluptatem sit.
+                nomenclature_id:
+                    type: integer
+                    description: ID номенклатуры
+                    example: 2080702308
+                    format: int32
+                notes:
+                    type: string
+                    description: Примечания
+                    example: Architecto minima vel quaerat sunt.
+                serial_number:
+                    type: string
+                    description: Заводской номер
+                    example: Consequatur accusamus corporis.
+                status:
+                    type: string
+                    description: Статус
+                    example: exp_sp
+                    enum:
+                        - exp
+                        - exp_int
+                        - exp_sp
+                        - broken
+                        - written_off
+            example:
+                arrival_date: "1998-12-25"
+                form_number: Sequi voluptatibus sint.
+                location: Assumenda accusantium nesciunt.
+                manufacture_date: "2013-01-14"
+                model_name: Deleniti esse consectetur.
+                nomenclature_id: 630577305
+                notes: Laudantium officiis porro et corrupti debitis a.
+                serial_number: Qui laudantium.
+                status: exp_int
+        Waybill:
+            type: object
+            properties:
+                from_dept:
+                    type: integer
+                    description: Код подразделения-отправителя
+                    example: 1387888464
+                    format: int32
+                issue_date:
+                    type: string
+                    description: Дата документа
+                    example: "2009-02-05"
+                    format: date
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WaybillsEquipment'
+                    description: Позиции накладной
+                    example:
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                number:
+                    type: string
+                    description: Номер документа
+                    example: Накладная №123
+                status:
+                    type: string
+                    description: Статус
+                    example: archived
+                    enum:
+                        - draft
+                        - signed
+                        - archived
+                to_dept:
+                    type: integer
+                    description: Код подразделения-получателя
+                    example: 1110032162
+                    format: int32
+            description: Накладная
+            example:
+                from_dept: 2015437715
+                issue_date: "2014-04-30"
+                items:
+                    - equipment_id: 906761579
+                      waybill_id: 241130727
+                    - equipment_id: 906761579
+                      waybill_id: 241130727
+                number: Накладная №123
+                status: archived
+                to_dept: 964235672
+            required:
+                - number
+                - issue_date
+                - status
+        WaybillList:
+            type: object
+            properties:
+                waybills:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Waybill'
+                    example:
+                        - from_dept: 527822651
+                          issue_date: "1997-07-16"
+                          items:
+                            - equipment_id: 906761579
+                              waybill_id: 241130727
+                            - equipment_id: 906761579
+                              waybill_id: 241130727
+                          number: Накладная №123
+                          status: archived
+                          to_dept: 135667098
+                        - from_dept: 527822651
+                          issue_date: "1997-07-16"
+                          items:
+                            - equipment_id: 906761579
+                              waybill_id: 241130727
+                            - equipment_id: 906761579
+                              waybill_id: 241130727
+                          number: Накладная №123
+                          status: archived
+                          to_dept: 135667098
+            example:
+                waybills:
+                    - from_dept: 527822651
+                      issue_date: "1997-07-16"
+                      items:
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                      number: Накладная №123
+                      status: archived
+                      to_dept: 135667098
+                    - from_dept: 527822651
+                      issue_date: "1997-07-16"
+                      items:
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                        - equipment_id: 906761579
+                          waybill_id: 241130727
+                      number: Накладная №123
+                      status: archived
+                      to_dept: 135667098
+            required:
+                - waybills
+        WaybillsEquipment:
+            type: object
+            properties:
+                equipment_id:
+                    type: integer
+                    description: ID оборудования
+                    example: 1240384705
+                    format: int32
+                waybill_id:
+                    type: integer
+                    description: ID накладной
+                    example: 883018374
+                    format: int32
+            description: Позиция накладной (связь накладной и оборудования)
+            example:
+                equipment_id: 1478805538
+                waybill_id: 458397845
+            required:
+                - waybill_id
+                - equipment_id
+tags:
+    - name: nomenclatures
+      description: Справочник номенклатур (только чтение)
+    - name: departments
+      description: Справочник подразделений (только чтение)
+    - name: cards
+      description: Управление карточками сотрудников
+    - name: equipments
+      description: Управление оборудованием
+    - name: waybills
+      description: Управление накладными
+    - name: assignments
+      description: История закреплений оборудования
