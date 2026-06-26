@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/Masachusets/stock_wise/gen/equipments"
 	"github.com/Masachusets/stock_wise/gen/waybills"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var funcMap = template.FuncMap{
@@ -55,7 +57,7 @@ func loadTemplates() *template.Template {
 	)
 }
 
-func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equipments.Service, wbSvc waybills.Service) {
+func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpool.Pool, eqSvc equipments.Service, wbSvc waybills.Service) {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
 			http.Redirect(w, r, "/equipments", http.StatusFound)
@@ -107,17 +109,111 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equip
 			http.NotFound(w, r)
 			return
 		}
-		res, err := wbSvc.List(r.Context())
+		rows, err := pool.Query(r.Context(), `SELECT w.id, w.number, w.issue_date::text, w.status,
+			fd.name, td.name
+		FROM waybills w
+		LEFT JOIN departments fd ON w.from_dept = fd.code
+		LEFT JOIN departments td ON w.to_dept = td.code
+		WHERE w.deleted_at IS NULL
+		ORDER BY w.issue_date DESC`)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer rows.Close()
+
+		type waybillRow struct {
+			ID        int32
+			Number    string
+			IssueDate string
+			Status    string
+			FromName  *string
+			ToName    *string
+		}
+		var waybillsList []waybillRow
+		for rows.Next() {
+			var wb waybillRow
+			if err := rows.Scan(&wb.ID, &wb.Number, &wb.IssueDate, &wb.Status, &wb.FromName, &wb.ToName); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			waybillsList = append(waybillsList, wb)
+		}
+
 		data := map[string]interface{}{
 			"Title":   "Накладные",
 			"Active":  "waybills",
-			"Waybills": res.Waybills,
+			"Waybills": waybillsList,
 		}
 		renderPage(w, tpl, "waybillsPage", data)
+	})
+
+	mux.HandleFunc("/waybills/", func(w http.ResponseWriter, r *http.Request) {
+		idStr := strings.TrimPrefix(r.URL.Path, "/waybills/")
+		if idStr == "" {
+			http.NotFound(w, r)
+			return
+		}
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		// Получить информацию о накладной
+		var wb struct {
+			Number    string
+			IssueDate string
+			Status    string
+			FromName  *string
+			ToName    *string
+		}
+		err = pool.QueryRow(r.Context(), `SELECT w.number, w.issue_date::text, w.status,
+			fd.name, td.name
+		FROM waybills w
+		LEFT JOIN departments fd ON w.from_dept = fd.code
+		LEFT JOIN departments td ON w.to_dept = td.code
+		WHERE w.id = $1`, id).Scan(&wb.Number, &wb.IssueDate, &wb.Status, &wb.FromName, &wb.ToName)
+		if err != nil {
+			http.Error(w, "накладная не найдена", http.StatusNotFound)
+			return
+		}
+
+		// Получить оборудование по накладной
+		eqRows, err := pool.Query(r.Context(), `SELECT e.inventory_number, COALESCE(e.model_name, ''), n.name
+		FROM waybills_equipments we
+		JOIN equipments e ON we.equipment_id = e.id
+		LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
+		WHERE we.waybill_id = $1`, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer eqRows.Close()
+
+		type eqItem struct {
+			InventoryNumber string
+			ModelName       string
+			Nomenclature    string
+		}
+		var equipments []eqItem
+		for eqRows.Next() {
+			var item eqItem
+			if err := eqRows.Scan(&item.InventoryNumber, &item.ModelName, &item.Nomenclature); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			equipments = append(equipments, item)
+		}
+
+		data := map[string]interface{}{
+			"Title":      fmt.Sprintf("Накладная %s", wb.Number),
+			"Active":     "waybills",
+			"Waybill":    wb,
+			"WaybillID":  id,
+			"Equipments": equipments,
+		}
+		renderPage(w, tpl, "waybillDetail", data)
 	})
 
 	// API endpoints for waybill actions (used by JS)

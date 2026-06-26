@@ -1,0 +1,62 @@
+{{define "waybillDetail"}}
+<h1>Накладная {{.Waybill.Number}}</h1>
+
+<a href="/waybills" class="back-link">← Назад к списку</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Информация о накладной</h2>
+        <span class="badge badge-{{.Waybill.Status}}">{{statusLabelWaybill .Waybill.Status}}</span>
+    </div>
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Номер</label>
+                <span>{{.Waybill.Number}}</span>
+            </div>
+            <div class="info-item">
+                <label>Дата</label>
+                <span>{{.Waybill.IssueDate}}</span>
+            </div>
+            <div class="info-item">
+                <label>Откуда</label>
+                <span>{{if .Waybill.FromName}}{{.Waybill.FromName}}{{else}}—{{end}}</span>
+            </div>
+            <div class="info-item">
+                <label>Куда</label>
+                <span>{{if .Waybill.ToName}}{{.Waybill.ToName}}{{else}}—{{end}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Оборудование</h2>
+    </div>
+    <div class="card-body">
+        {{if .Equipments}}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Инв. номер</th>
+                        <th>Наименование</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Equipments}}
+                    <tr onclick="window.location='/equipments/{{.InventoryNumber}}'" style="cursor:pointer">
+                        <td><strong>{{.InventoryNumber}}</strong></td>
+                        <td>{{if .Nomenclature}}{{.Nomenclature}}{{else}}{{.ModelName}}{{end}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <p class="info">Нет оборудования</p>
+        {{end}}
+    </div>
+</div>
+{{end}}

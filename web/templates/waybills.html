@@ -1,37 +1,39 @@
 {{define "waybillsPage"}}
 <h1>Накладные</h1>
 
-<table id="waybillsTable">
-    <thead>
-        <tr>
-            <th>Номер</th>
-            <th>Дата</th>
-            <th>Статус</th>
-            <th>Откуда</th>
-            <th>Куда</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Waybills}}
-        <tr>
-            <td><strong>{{.Number}}</strong></td>
-            <td>{{.IssueDate}}</td>
-            <td><span class="badge badge-{{.Status}}">{{statusLabelWaybill .Status}}</span></td>
-            <td>{{if .FromDept}}{{.FromDept}}{{else}}—{{end}}</td>
-            <td>{{if .ToDept}}{{.ToDept}}{{else}}—{{end}}</td>
-            <td>
-                {{if eq .Status "draft"}}
-                <button class="btn btn-success" onclick="signWaybill('{{.ID}}')">Подписать</button>
-                <button class="btn btn-danger" onclick="deleteWaybill('{{.ID}}')">Удалить</button>
-                {{else if eq .Status "signed"}}
-                <button class="btn btn-primary" onclick="archiveWaybill('{{.ID}}')">Архивировать</button>
-                {{end}}
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+<div class="table-wrapper">
+    <table id="waybillsTable">
+        <thead>
+            <tr>
+                <th>Номер</th>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Откуда</th>
+                <th>Куда</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Waybills}}
+            <tr onclick="window.location='/waybills/{{.ID}}'" style="cursor:pointer">
+                <td><strong>{{.Number}}</strong></td>
+                <td>{{.IssueDate}}</td>
+                <td><span class="badge badge-{{.Status}}">{{statusLabelWaybill .Status}}</span></td>
+                <td>{{if .FromName}}{{.FromName}}{{else}}—{{end}}</td>
+                <td>{{if .ToName}}{{.ToName}}{{else}}—{{end}}</td>
+                <td onclick="event.stopPropagation()">
+                    {{if eq .Status "draft"}}
+                    <button class="btn btn-success" onclick="signWaybill('{{.ID}}')">Подписать</button>
+                    <button class="btn btn-danger" onclick="deleteWaybill('{{.ID}}')">Удалить</button>
+                    {{else if eq .Status "signed"}}
+                    <button class="btn btn-primary" onclick="archiveWaybill('{{.ID}}')">Архивировать</button>
+                    {{end}}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
 
 <div class="info">Всего: {{len .Waybills}} накладных</div>
 {{end}}

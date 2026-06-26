@@ -167,7 +167,7 @@ func runApp(cfg *config.Config) error {
 
 	// Регистрация веб-хэндлеров (шаблоны + статика)
 	tpl := loadTemplates()
-	registerWebHandlers(rootMux, tpl, equipmentsSvc, waybillsSvc)
+	registerWebHandlers(rootMux, tpl, pool, equipmentsSvc, waybillsSvc)
 
 	// Монтирование API-хэндлеров на /api/
 	rootMux.Handle("/api/", http.StripPrefix("/api", mux))
