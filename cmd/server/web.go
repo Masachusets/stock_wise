@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -75,12 +74,13 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equip
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		slog.Debug("equipment list", "count", len(res.Equipments))
 		data := map[string]interface{}{
 			"Title":     "Оборудование",
 			"Active":    "equipments",
 			"Equipments": res.Equipments,
 		}
-		tpl.ExecuteTemplate(w, "layout.html", data)
+		renderPage(w, tpl, "equipmentList", data)
 	})
 
 	mux.HandleFunc("/equipments/", func(w http.ResponseWriter, r *http.Request) {
@@ -99,7 +99,7 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equip
 			"Active":    "equipments",
 			"Equipment": res,
 		}
-		tpl.ExecuteTemplate(w, "layout.html", data)
+		renderPage(w, tpl, "equipmentDetail", data)
 	})
 
 	mux.HandleFunc("/waybills", func(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +117,7 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equip
 			"Active":  "waybills",
 			"Waybills": res.Waybills,
 		}
-		tpl.ExecuteTemplate(w, "layout.html", data)
+		renderPage(w, tpl, "waybillsPage", data)
 	})
 
 	// API endpoints for waybill actions (used by JS)
@@ -170,7 +170,15 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, eqSvc equip
 	slog.Info("web handlers registered")
 }
 
-func renderError(w http.ResponseWriter, err error) {
-	slog.Error("template error", "error", err)
-	http.Error(w, fmt.Sprintf("template error: %v", err), http.StatusInternalServerError)
+func renderPage(w http.ResponseWriter, tpl *template.Template, pageTmpl string, data map[string]interface{}) {
+	var buf strings.Builder
+	if err := tpl.ExecuteTemplate(&buf, pageTmpl, data); err != nil {
+		slog.Error("template error", "error", err)
+		http.Error(w, "template error", http.StatusInternalServerError)
+		return
+	}
+	data["Content"] = template.HTML(buf.String())
+	if err := tpl.ExecuteTemplate(w, "layout.html", data); err != nil {
+		slog.Error("layout error", "error", err)
+	}
 }
