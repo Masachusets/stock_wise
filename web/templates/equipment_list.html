@@ -22,8 +22,8 @@
                 <th>Статус</th>
                 <th>Год выпуска</th>
                 <th>Дата поступления</th>
-                <th>Локация</th>
                 <th>Закрепление</th>
+                <th>Локация</th>
             </tr>
         </thead>
         <tbody>
@@ -34,7 +34,6 @@
                 <td><span class="badge badge-{{.Status}}">{{statusLabel .Status}}</span></td>
                 <td>{{if .ManufactureDate}}{{.ManufactureDate}}{{else}}—{{end}}</td>
                 <td>{{if .ArrivalDate}}{{.ArrivalDate}}{{else}}—{{end}}</td>
-                <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
                 <td>
                     {{if .Assignment}}
                         {{if eq .Assignment.TargetType "employee"}}
@@ -48,6 +47,7 @@
                         —
                     {{end}}
                 </td>
+                <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
             </tr>
             {{end}}
         </tbody>
