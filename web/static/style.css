@@ -30,8 +30,9 @@ main { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
 .filters input { flex: 1; }
 
 /* Tables */
+.table-wrapper { overflow-x: auto; }
 table { width: 100%; background: white; border-collapse: collapse; box-shadow: var(--shadow); border-radius: 8px; overflow: hidden; }
-th { background: var(--dark); color: white; padding: 12px; text-align: left; font-weight: 500; }
+th { background: var(--dark); color: white; padding: 12px; text-align: left; font-weight: 500; white-space: nowrap; }
 td { padding: 12px; border-bottom: 1px solid var(--border); }
 tr:hover { background: var(--light); }
 

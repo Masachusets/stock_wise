@@ -31,9 +31,14 @@ func (s *service) List(ctx context.Context, p *gen.ListPayload) (res *gen.Equipm
 		e.inventory_number, e.serial_number,
 		n.code, n.name,
 		COALESCE(e.model_name, ''), e.manufacture_date::text, e.arrival_date::text,
-		e.status, e.form_number, e.location, e.notes
+		e.status, e.form_number, e.location, e.notes,
+		a.target_type, c.full_name, w.number, td.name
 	FROM equipments e
 	LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
+	LEFT JOIN equipments_assignments a ON a.equipment_id = e.id AND a.is_active = TRUE
+	LEFT JOIN cards c ON a.card_number = c.number
+	LEFT JOIN waybills w ON a.waybill_id = w.id
+	LEFT JOIN departments td ON w.to_dept = td.code
 	WHERE e.deleted_at IS NULL`
 
 	args := []any{}
@@ -72,11 +77,13 @@ func (s *service) List(ctx context.Context, p *gen.ListPayload) (res *gen.Equipm
 	for rows.Next() {
 		e := &gen.Equipment{}
 		var invNum, status, modelName, serialNum, nomCode, nomName, mfgDate, arrDate, formNum, loc, notes interface{}
+		var targetType, empFullName, wbNumber, deptName interface{}
 		if err := rows.Scan(
 			&invNum, &serialNum,
 			&nomCode, &nomName,
 			&modelName, &mfgDate, &arrDate,
 			&status, &formNum, &loc, &notes,
+			&targetType, &empFullName, &wbNumber, &deptName,
 		); err != nil {
 			return nil, err
 		}
@@ -95,6 +102,15 @@ func (s *service) List(ctx context.Context, p *gen.ListPayload) (res *gen.Equipm
 				Name: fmt.Sprintf("%v", nomName),
 			}
 			e.Nomenclature = n
+		}
+		if targetType != nil {
+			ai := &gen.AssignmentInfo{
+				TargetType: fmt.Sprintf("%v", targetType),
+				FullName:   strPtr(empFullName),
+				WaybillNumber: strPtr(wbNumber),
+				ToDeptName: strPtr(deptName),
+			}
+			e.Assignment = ai
 		}
 		equipments = append(equipments, e)
 	}

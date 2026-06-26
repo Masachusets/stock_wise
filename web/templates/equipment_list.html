@@ -2,7 +2,7 @@
 <h1>Оборудование</h1>
 
 <div class="filters">
-    <input type="text" id="search" placeholder="Поиск по инв. номеру или модели..." oninput="filterTable()">
+    <input type="text" id="search" placeholder="Поиск по инв. номеру или наименованию..." oninput="filterTable()">
     <select id="statusFilter" onchange="filterTable()">
         <option value="">Все статусы</option>
         <option value="exp">Эксплуатируемое</option>
@@ -13,40 +13,46 @@
     </select>
 </div>
 
-<table id="equipmentTable">
-    <thead>
-        <tr>
-            <th>Инв. номер</th>
-            <th>Модель</th>
-            <th>Статус</th>
-            <th>Локация</th>
-            <th>Закрепление</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Equipments}}
-        <tr onclick="window.location='/equipments/{{.InventoryNumber}}'" style="cursor:pointer">
-            <td><strong>{{.InventoryNumber}}</strong></td>
-            <td>{{.ModelName}}</td>
-            <td><span class="badge badge-{{.Status}}">{{statusLabel .Status}}</span></td>
-            <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
-            <td>
-                {{if .Assignment}}
-                    {{if eq .Assignment.TargetType "employee"}}
-                        👤 {{.Assignment.FullName}}
-                    {{else if eq .Assignment.TargetType "department"}}
-                        🏢 {{.Assignment.WaybillNumber}}
-                    {{else if eq .Assignment.TargetType "warehouse"}}
-                        📦 Склад
+<div class="table-wrapper">
+    <table id="equipmentTable">
+        <thead>
+            <tr>
+                <th>Инв. номер</th>
+                <th>Наименование</th>
+                <th>Статус</th>
+                <th>Год выпуска</th>
+                <th>Дата поступления</th>
+                <th>Локация</th>
+                <th>Закрепление</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Equipments}}
+            <tr onclick="window.location='/equipments/{{.InventoryNumber}}'" style="cursor:pointer">
+                <td><strong>{{.InventoryNumber}}</strong></td>
+                <td>{{if .Nomenclature}}{{.Nomenclature.Name}}{{else}}—{{end}}</td>
+                <td><span class="badge badge-{{.Status}}">{{statusLabel .Status}}</span></td>
+                <td>{{if .ManufactureDate}}{{.ManufactureDate}}{{else}}—{{end}}</td>
+                <td>{{if .ArrivalDate}}{{.ArrivalDate}}{{else}}—{{end}}</td>
+                <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
+                <td>
+                    {{if .Assignment}}
+                        {{if eq .Assignment.TargetType "employee"}}
+                            👤 {{if .Assignment.FullName}}{{.Assignment.FullName}}{{else}}—{{end}}
+                        {{else if eq .Assignment.TargetType "department"}}
+                            🏢 {{if .Assignment.ToDeptName}}{{.Assignment.ToDeptName}}{{else}}{{.Assignment.WaybillNumber}}{{end}}
+                        {{else if eq .Assignment.TargetType "warehouse"}}
+                            📦 Склад
+                        {{end}}
+                    {{else}}
+                        —
                     {{end}}
-                {{else}}
-                    —
-                {{end}}
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
 
 <div class="info">Всего: {{len .Equipments}} единиц</div>
 {{end}}
