@@ -6,7 +6,11 @@
 <div class="card">
     <div class="card-header">
         <h2>{{.Equipment.ModelName}}</h2>
-        <span class="badge badge-{{.Equipment.Status}}">{{statusLabel .Equipment.Status}}</span>
+        <div>
+            <span class="badge badge-{{.Equipment.Status}}">{{statusLabel .Equipment.Status}}</span>
+            <button class="btn btn-primary" onclick="showEditModal()">Изменить</button>
+            <button class="btn btn-danger" onclick="deleteEquipment('{{.Equipment.InventoryNumber}}')">Удалить</button>
+        </div>
     </div>
 
     <div class="card-body">
@@ -95,4 +99,59 @@
     </div>
 </div>
 {{end}}
+
+<div id="editModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Изменить оборудование</h2>
+            <span class="modal-close" onclick="hideEditModal()">&times;</span>
+        </div>
+        <form id="editForm" onsubmit="submitEdit(event)">
+            <input type="hidden" name="inventory_number" value="{{.Equipment.InventoryNumber}}">
+            <div class="form-group">
+                <label>Наименование</label>
+                <select name="nomenclature_id">
+                    <option value="">Не выбрано</option>
+                    {{range .Nomenclatures}}
+                    <option value="{{.ID}}" {{if $.Equipment.Nomenclature}}{{if eq $.Equipment.Nomenclature.Code .Code}}selected{{end}}{{end}}>{{.Code}} — {{.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Модель</label>
+                <input type="text" name="model_name" value="{{.Equipment.ModelName}}">
+            </div>
+            <div class="form-group">
+                <label>Статус</label>
+                <select name="status">
+                    <option value="exp" {{if eq .Equipment.Status "exp"}}selected{{end}}>Эксплуатируемое</option>
+                    <option value="exp_int" {{if eq .Equipment.Status "exp_int"}}selected{{end}}>Эксплуатируемое (интернет)</option>
+                    <option value="exp_sp" {{if eq .Equipment.Status "exp_sp"}}selected{{end}}>Эксплуатируемое (категорированное)</option>
+                    <option value="broken" {{if eq .Equipment.Status "broken"}}selected{{end}}>Неисправное</option>
+                    <option value="written_off" {{if eq .Equipment.Status "written_off"}}selected{{end}}>Списанное</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Заводской номер</label>
+                <input type="text" name="serial_number" value="{{if .Equipment.SerialNumber}}{{.Equipment.SerialNumber}}{{end}}">
+            </div>
+            <div class="form-group">
+                <label>Дата изготовления</label>
+                <input type="date" name="manufacture_date" value="{{.Equipment.ManufactureDate}}">
+            </div>
+            <div class="form-group">
+                <label>Дата поступления</label>
+                <input type="date" name="arrival_date" value="{{.Equipment.ArrivalDate}}">
+            </div>
+            <div class="form-group">
+                <label>Примечания</label>
+                <textarea name="notes">{{.Equipment.Notes}}</textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" onclick="hideEditModal()">Отмена</button>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
 {{end}}

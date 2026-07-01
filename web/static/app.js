@@ -30,6 +30,46 @@ function deleteWaybill(id) {
         .then(r => r.ok ? location.reload() : alert('Ошибка'));
 }
 
+function showEditModal() {
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function hideEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function deleteEquipment(invNum) {
+    if (!confirm('Удалить оборудование ' + invNum + '?')) return;
+    fetch('/equipments/' + invNum + '/delete', { method: 'POST' })
+        .then(r => {
+            if (r.ok) window.location = '/equipments';
+            else r.text().then(t => alert('Ошибка: ' + t));
+        });
+}
+
+function submitEdit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const fd = new FormData(form);
+    const data = {};
+    fd.forEach((v, k) => {
+        if (!v) return;
+        if (k === 'nomenclature_id') data[k] = parseInt(v, 10);
+        else data[k] = v;
+    });
+    const invNum = form.querySelector('[name="inventory_number"]').value;
+
+    fetch('/equipments/' + invNum + '/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => {
+        if (r.ok) location.reload();
+        else r.text().then(t => alert('Ошибка: ' + t));
+    });
+}
+
 function showModal() {
     document.getElementById('modal').style.display = 'flex';
 }
