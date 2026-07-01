@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log/slog"
@@ -102,6 +103,49 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			"Equipment": res,
 		}
 		renderPage(w, tpl, "equipmentDetail", data)
+	})
+
+	mux.HandleFunc("/equipments/add", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var body struct {
+			InventoryNumber string  `json:"inventory_number"`
+			ModelName       string  `json:"model_name"`
+			Status          string  `json:"status"`
+			SerialNumber    *string `json:"serial_number"`
+			ManufactureDate *string `json:"manufacture_date"`
+			ArrivalDate     *string `json:"arrival_date"`
+			Location        *string `json:"location"`
+			Notes           *string `json:"notes"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, "invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		slog.Debug("adding equipment", "inventory_number", body.InventoryNumber, "model_name", body.ModelName)
+
+		payload := &equipments.CreateEquipmentPayload{
+			InventoryNumber: body.InventoryNumber,
+			ModelName:       body.ModelName,
+			Status:          body.Status,
+			SerialNumber:    body.SerialNumber,
+			ManufactureDate: body.ManufactureDate,
+			ArrivalDate:     body.ArrivalDate,
+			Location:        body.Location,
+			Notes:           body.Notes,
+		}
+
+		_, err := eqSvc.Create(r.Context(), payload)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	})
 
 	mux.HandleFunc("/waybills", func(w http.ResponseWriter, r *http.Request) {

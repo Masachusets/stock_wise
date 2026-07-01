@@ -29,3 +29,29 @@ function deleteWaybill(id) {
     fetch('/api/waybills/' + id, { method: 'DELETE' })
         .then(r => r.ok ? location.reload() : alert('Ошибка'));
 }
+
+function showModal() {
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function hideModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function submitForm(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = {};
+    const fd = new FormData(form);
+    fd.forEach((v, k) => { if (v) data[k] = v; });
+
+    fetch('/equipments/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => {
+        if (r.ok) location.reload();
+        else r.text().then(t => alert('Ошибка: ' + t));
+    });
+}
