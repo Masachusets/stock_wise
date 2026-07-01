@@ -1,16 +1,18 @@
 {{define "equipmentList"}}
-<h1>Оборудование <button class="btn btn-success" onclick="showModal()">Добавить</button></h1>
+<div class="sticky-top">
+    <h1>Оборудование <button class="btn btn-success" onclick="showModal()">Добавить</button></h1>
 
-<div class="filters">
-    <input type="text" id="search" placeholder="Поиск по инв. номеру или наименованию..." oninput="filterTable()">
-    <select id="statusFilter" onchange="filterTable()">
-        <option value="">Все статусы</option>
-        <option value="exp">Эксплуатируемое</option>
-        <option value="exp_int">Эксплуатируемое (интернет)</option>
-        <option value="exp_sp">Эксплуатируемое (категорированное)</option>
-        <option value="broken">Неисправное</option>
-        <option value="written_off">Списанное</option>
-    </select>
+    <div class="filters">
+        <input type="text" id="search" placeholder="Поиск по инв. номеру или наименованию..." oninput="filterTable()">
+        <select id="statusFilter" onchange="filterTable()">
+            <option value="">Все статусы</option>
+            <option value="exp">Эксплуатируемое</option>
+            <option value="exp_int">Эксплуатируемое (интернет)</option>
+            <option value="exp_sp">Эксплуатируемое (категорированное)</option>
+            <option value="broken">Неисправное</option>
+            <option value="written_off">Списанное</option>
+        </select>
+    </div>
 </div>
 
 <div class="table-wrapper">
