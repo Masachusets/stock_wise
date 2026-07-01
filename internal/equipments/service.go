@@ -46,6 +46,7 @@ func (s *service) Create(ctx context.Context, p *gen.CreateEquipmentPayload) (re
 	e := &Equipment{
 		InventoryNumber: p.InventoryNumber,
 		SerialNumber:    p.SerialNumber,
+		NomenclatureID:  p.NomenclatureID,
 		ModelName:       p.ModelName,
 		ManufactureDate: p.ManufactureDate,
 		ArrivalDate:     p.ArrivalDate,

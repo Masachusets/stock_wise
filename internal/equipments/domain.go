@@ -6,6 +6,7 @@ import "context"
 type Equipment struct {
 	InventoryNumber string
 	SerialNumber    *string
+	NomenclatureID  *int32
 	Nomenclature    *NomenclatureInfo
 	ModelName       string
 	ManufactureDate *string

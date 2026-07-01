@@ -192,7 +192,7 @@ func (r *postgresRepository) Create(ctx context.Context, eq *Equipment) error {
 		(inventory_number, serial_number, nomenclature_id, model_name, manufacture_date, arrival_date, status, form_number, location, notes)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		ON CONFLICT (inventory_number) DO NOTHING`,
-		eq.InventoryNumber, eq.SerialNumber, nil, eq.ModelName,
+		eq.InventoryNumber, eq.SerialNumber, eq.NomenclatureID, eq.ModelName,
 		eq.ManufactureDate, eq.ArrivalDate, eq.Status, eq.FormNumber, eq.Location, eq.Notes)
 	return err
 }
