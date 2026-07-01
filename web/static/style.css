@@ -89,3 +89,8 @@ form { padding: 20px; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
 .form-group textarea { height: 80px; resize: vertical; }
 .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* Input with prefix */
+.input-with-prefix { display: flex; align-items: center; }
+.input-prefix { background: var(--light); border: 1px solid var(--border); border-right: none; padding: 8px 12px; border-radius: 4px 0 0 4px; color: var(--gray); font-size: 14px; }
+.input-with-prefix input { border-radius: 0 4px 4px 0; }

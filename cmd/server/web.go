@@ -77,11 +77,36 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		// Получить список номенклатур для формы
+		nomRows, err := pool.Query(r.Context(), "SELECT id, code, name FROM nomenclatures ORDER BY code")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer nomRows.Close()
+
+		type nomItem struct {
+			ID   int32
+			Code string
+			Name string
+		}
+		var nomenclatures []nomItem
+		for nomRows.Next() {
+			var n nomItem
+			if err := nomRows.Scan(&n.ID, &n.Code, &n.Name); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			nomenclatures = append(nomenclatures, n)
+		}
+
 		slog.Debug("equipment list", "count", len(res.Equipments))
 		data := map[string]interface{}{
-			"Title":     "Оборудование",
-			"Active":    "equipments",
-			"Equipments": res.Equipments,
+			"Title":        "Оборудование",
+			"Active":       "equipments",
+			"Equipments":   res.Equipments,
+			"Nomenclatures": nomenclatures,
 		}
 		renderPage(w, tpl, "equipmentList", data)
 	})
@@ -115,10 +140,10 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			InventoryNumber string  `json:"inventory_number"`
 			ModelName       string  `json:"model_name"`
 			Status          string  `json:"status"`
+			NomenclatureID  *int32  `json:"nomenclature_id"`
 			SerialNumber    *string `json:"serial_number"`
 			ManufactureDate *string `json:"manufacture_date"`
 			ArrivalDate     *string `json:"arrival_date"`
-			Location        *string `json:"location"`
 			Notes           *string `json:"notes"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -132,10 +157,10 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			InventoryNumber: body.InventoryNumber,
 			ModelName:       body.ModelName,
 			Status:          body.Status,
+			NomenclatureID:  body.NomenclatureID,
 			SerialNumber:    body.SerialNumber,
 			ManufactureDate: body.ManufactureDate,
 			ArrivalDate:     body.ArrivalDate,
-			Location:        body.Location,
 			Notes:           body.Notes,
 		}
 
@@ -143,6 +168,20 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+
+		// Автоматическое закрепление за складом
+		var eqID int32
+		err = pool.QueryRow(r.Context(), "SELECT id FROM equipments WHERE inventory_number = $1", body.InventoryNumber).Scan(&eqID)
+		if err == nil {
+			// Найти waybill для СКЛАДа (код 100)
+			var wbID int32
+			err = pool.QueryRow(r.Context(), "SELECT id FROM waybills WHERE number = 'ПОДР-100'").Scan(&wbID)
+			if err == nil {
+				pool.Exec(r.Context(),
+					`INSERT INTO equipments_assignments (equipment_id, target_type, waybill_id)
+					 VALUES ($1, 'warehouse', $2)`, eqID, wbID)
+			}
 		}
 
 		w.WriteHeader(http.StatusOK)

@@ -41,6 +41,19 @@ function hideModal() {
 function submitForm(e) {
     e.preventDefault();
     const form = e.target;
+
+    // Validate dates
+    const mfg = document.getElementById('manufacture_date').value;
+    const arr = document.getElementById('arrival_date').value;
+    if (mfg && arr && mfg > arr) {
+        alert('Дата изготовления должна быть раньше даты поступления');
+        return;
+    }
+
+    // Add "ИТ" prefix to inventory number
+    const invInput = form.querySelector('[name="inventory_number"]');
+    invInput.value = 'ИТ' + invInput.value;
+
     const data = {};
     const fd = new FormData(form);
     fd.forEach((v, k) => { if (v) data[k] = v; });
