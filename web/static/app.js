@@ -50,13 +50,21 @@ function submitForm(e) {
         return;
     }
 
-    // Add "ИТ" prefix to inventory number
-    const invInput = form.querySelector('[name="inventory_number"]');
-    invInput.value = 'ИТ' + invInput.value;
-
     const data = {};
     const fd = new FormData(form);
-    fd.forEach((v, k) => { if (v) data[k] = v; });
+    fd.forEach((v, k) => {
+        if (!v) return;
+        // Преобразуем nomenclature_id в число
+        if (k === 'nomenclature_id') {
+            data[k] = parseInt(v, 10);
+        } else {
+            data[k] = v;
+        }
+    });
+
+    // Добавляем "ИТ" к инвентарному номеру
+    const invInput = form.querySelector('[name="inventory_number"]');
+    data['inventory_number'] = 'ИТ' + invInput.value;
 
     fetch('/equipments/add', {
         method: 'POST',
