@@ -124,10 +124,7 @@ func convertToGen(e *Equipment) *gen.Equipment {
 			TargetType:      e.Assignment.TargetType,
 			CardNumber:      e.Assignment.CardNumber,
 			FullName:        e.Assignment.FullName,
-			WaybillNumber:   e.Assignment.WaybillNumber,
-			WaybillDate:     e.Assignment.WaybillDate,
-			FromDeptName:    e.Assignment.FromDeptName,
-			ToDeptName:      e.Assignment.ToDeptName,
+			DeptName:        e.Assignment.DeptName,
 			OperatorComment: e.Assignment.OperatorComment,
 		}
 	}

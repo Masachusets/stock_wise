@@ -174,14 +174,11 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 		var eqID int32
 		err = pool.QueryRow(r.Context(), "SELECT id FROM equipments WHERE inventory_number = $1", body.InventoryNumber).Scan(&eqID)
 		if err == nil {
-			// Найти waybill для СКЛАДа (код 100)
-			var wbID int32
-			err = pool.QueryRow(r.Context(), "SELECT id FROM waybills WHERE number = 'ПОДР-100'").Scan(&wbID)
-			if err == nil {
-				pool.Exec(r.Context(),
-					`INSERT INTO equipments_assignments (equipment_id, target_type, waybill_id)
-					 VALUES ($1, 'warehouse', $2)`, eqID, wbID)
-			}
+			// Закрепить за складом (код 100)
+			deptCode := 100
+			pool.Exec(r.Context(),
+				`INSERT INTO equipments_assignments (equipment_id, target_type, department_code)
+				 VALUES ($1, 'warehouse', $2)`, eqID, deptCode)
 		}
 
 		w.WriteHeader(http.StatusOK)

@@ -76,21 +76,9 @@
             </div>
             {{else if eq .Equipment.Assignment.TargetType "department"}}
             <div class="info-item">
-                <label>Накладная</label>
-                <span>{{.Equipment.Assignment.WaybillNumber}}</span>
+                <label>Подразделение</label>
+                <span>{{if .Equipment.Assignment.DeptName}}{{.Equipment.Assignment.DeptName}}{{else}}—{{end}}</span>
             </div>
-            {{if .Equipment.Assignment.FromDeptName}}
-            <div class="info-item">
-                <label>Откуда</label>
-                <span>{{.Equipment.Assignment.FromDeptName}}</span>
-            </div>
-            {{end}}
-            {{if .Equipment.Assignment.ToDeptName}}
-            <div class="info-item">
-                <label>Куда</label>
-                <span>{{.Equipment.Assignment.ToDeptName}}</span>
-            </div>
-            {{end}}
             {{else if eq .Equipment.Assignment.TargetType "warehouse"}}
             <div class="info-item">
                 <label>Местоположение</label>

@@ -90,13 +90,21 @@ func (s *service) Sign(ctx context.Context, p *gen.SignPayload) (res *gen.Waybil
 		return nil, err
 	}
 
+	// Получить to_dept из накладной
+	wb, err := s.repo.Get(ctx, p.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	eqIDs, err := s.repo.GetEquipmentIDs(ctx, p.ID)
 	if err != nil {
 		return nil, err
 	}
 	for _, eqID := range eqIDs {
-		if err := s.repo.CreateAssignment(ctx, eqID, p.ID); err != nil {
-			return nil, err
+		if wb.ToDept != nil {
+			if err := s.repo.CreateAssignment(ctx, eqID, *wb.ToDept); err != nil {
+				return nil, err
+			}
 		}
 	}
 

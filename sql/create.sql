@@ -119,7 +119,7 @@ CREATE TABLE equipments_assignments (
 
     -- Целевые ссылки (заполняются в зависимости от target_type)
     card_number      INT REFERENCES cards(number) ON DELETE RESTRICT,
-    waybill_id       INT REFERENCES waybills(id) ON DELETE RESTRICT,
+    department_code  INT REFERENCES departments(code) ON DELETE RESTRICT,
 
     -- Временные метки
     assigned_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -131,11 +131,11 @@ CREATE TABLE equipments_assignments (
 
     -- 🔒 ДОМЕННЫЕ ОГРАНИЧЕНИЯ (CHECK Constraints)
     CONSTRAINT chk_target CHECK (
-        (target_type = 'employee'   AND card_number IS NOT NULL AND waybill_id IS NULL)
+        (target_type = 'employee'   AND card_number IS NOT NULL AND department_code IS NULL)
         OR
-        (target_type = 'department' AND card_number IS NULL AND waybill_id IS NOT NULL)
+        (target_type = 'department' AND card_number IS NULL AND department_code IS NOT NULL)
         OR
-        (target_type = 'warehouse'  AND card_number IS NULL AND waybill_id IS NOT NULL)
+        (target_type = 'warehouse'  AND card_number IS NULL AND department_code IS NOT NULL)
     )
 );
 

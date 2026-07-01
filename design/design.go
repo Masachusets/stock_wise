@@ -67,14 +67,7 @@ var AssignmentInfo = Type("AssignmentInfo", func() {
 	Attribute("full_name", String, "ФИО сотрудника", func() {
 		Example("Багликов А.С.")
 	})
-	Attribute("waybill_number", String, "Номер накладной", func() {
-		Example("ПОДР-100")
-	})
-	Attribute("waybill_date", String, "Дата накладной", func() {
-		Format(FormatDate)
-	})
-	Attribute("from_dept_name", String, "Подразделение-отправитель")
-	Attribute("to_dept_name", String, "Подразделение-получатель")
+	Attribute("dept_name", String, "Наименование подразделения")
 	Attribute("operator_comment", String, "Комментарий оператора")
 	Required("target_type")
 })
@@ -139,12 +132,7 @@ var Assignment = Type("Assignment", func() {
 	})
 	Attribute("card_number", Int32, "Номер карточки сотрудника")
 	Attribute("full_name", String, "ФИО сотрудника")
-	Attribute("waybill_number", String, "Номер накладной")
-	Attribute("waybill_date", String, "Дата накладной", func() {
-		Format(FormatDate)
-	})
-	Attribute("from_dept_name", String, "Подразделение-отправитель")
-	Attribute("to_dept_name", String, "Подразделение-получатель")
+	Attribute("dept_name", String, "Наименование подразделения")
 	Attribute("assigned_at", String, "Дата закрепления", func() {
 		Format(FormatDateTime)
 	})

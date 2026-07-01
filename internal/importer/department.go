@@ -169,11 +169,13 @@ func parseDeptTypeAndName(raw string) (typ string, name string) {
 
 	for _, tk := range typeKeywords {
 		if idx := strings.Index(lower, tk.keyword); idx >= 0 {
-			// Remove the keyword and any separators around it
-			rest := raw
-			// Remove keyword
-			rest = rest[:idx] + rest[idx+len(tk.keyword):]
-			// Remove leading/trailing separators
+			// Если ключевое слово в конце — оставляем полное имя (например "Комарин ПОГЗ")
+			afterIdx := idx + len(tk.keyword)
+			if afterIdx == len(lower) {
+				return tk.typ, raw
+			}
+			// Иначе убираем ключевое слово
+			rest := raw[:idx] + raw[afterIdx:]
 			rest = strings.Trim(rest, "/ ")
 			if rest == "" {
 				rest = raw

@@ -42,7 +42,7 @@ func UsageExamples() string {
 	return os.Args[0] + " " + "nomenclatures list" + "\n" +
 		os.Args[0] + " " + "departments list" + "\n" +
 		os.Args[0] + " " + "cards list" + "\n" +
-		os.Args[0] + " " + "equipments list --status \"exp_sp\" --nomenclature-id 427335905 --location \"Temporibus ullam id non labore.\" --search \"Nobis nisi iure sint iusto qui velit.\"" + "\n" +
+		os.Args[0] + " " + "equipments list --status \"broken\" --nomenclature-id 1958819844 --location \"Laboriosam nemo rerum et aspernatur quia.\" --search \"Voluptas quia minus soluta.\"" + "\n" +
 		os.Args[0] + " " + "waybills list" + "\n" +
 		""
 }
@@ -461,7 +461,7 @@ func nomenclaturesGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "nomenclatures get --id 313162773")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "nomenclatures get --id 968267662")
 }
 
 // departmentsUsage displays the usage of the departments command and its
@@ -507,7 +507,7 @@ func departmentsGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "departments get --code 1311633180")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "departments get --code 1383710325")
 }
 
 // cardsUsage displays the usage of the cards command and its subcommands.
@@ -555,7 +555,7 @@ func cardsGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards get --number 4508957")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards get --number 251941874")
 }
 
 func cardsCreateUsage() {
@@ -573,7 +573,7 @@ func cardsCreateUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards create --body '{\n      \"full_name\": \"Veniam officiis mollitia fugiat voluptatem numquam tempore.\",\n      \"number\": 110122744\n   }'")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards create --body '{\n      \"full_name\": \"Repudiandae nihil repellendus in est.\",\n      \"number\": 48089892\n   }'")
 }
 
 func cardsUpdateUsage() {
@@ -593,7 +593,7 @@ func cardsUpdateUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards update --body '{\n      \"full_name\": \"Quo veniam.\"\n   }' --number 1826588538")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards update --body '{\n      \"full_name\": \"Nam eaque similique suscipit suscipit.\"\n   }' --number 1758824794")
 }
 
 func cardsDeleteUsage() {
@@ -611,7 +611,7 @@ func cardsDeleteUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards delete --number 301150917")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "cards delete --number 1524586912")
 }
 
 // equipmentsUsage displays the usage of the equipments command and its
@@ -650,7 +650,7 @@ func equipmentsListUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments list --status \"exp_sp\" --nomenclature-id 427335905 --location \"Temporibus ullam id non labore.\" --search \"Nobis nisi iure sint iusto qui velit.\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments list --status \"broken\" --nomenclature-id 1958819844 --location \"Laboriosam nemo rerum et aspernatur quia.\" --search \"Voluptas quia minus soluta.\"")
 }
 
 func equipmentsGetUsage() {
@@ -668,7 +668,7 @@ func equipmentsGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments get --inventory-number \"Aperiam dicta et molestiae esse sit dolores.\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments get --inventory-number \"Ipsa et enim non numquam eum sint.\"")
 }
 
 func equipmentsCreateUsage() {
@@ -686,7 +686,7 @@ func equipmentsCreateUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments create --body '{\n      \"arrival_date\": \"2009-04-15\",\n      \"form_number\": \"Repellat quisquam voluptatem iure et.\",\n      \"inventory_number\": \"At corporis corrupti eum et.\",\n      \"location\": \"Accusantium ipsam et ab animi harum.\",\n      \"manufacture_date\": \"1984-02-05\",\n      \"model_name\": \"Sint tempora occaecati.\",\n      \"nomenclature_id\": 1255132092,\n      \"notes\": \"Saepe facere ex explicabo.\",\n      \"serial_number\": \"Ex dicta qui asperiores quam.\",\n      \"status\": \"exp\"\n   }'")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments create --body '{\n      \"arrival_date\": \"1973-06-12\",\n      \"form_number\": \"Labore ullam voluptas modi laboriosam.\",\n      \"inventory_number\": \"Recusandae ullam vitae aperiam dicta.\",\n      \"location\": \"Consequatur quisquam aut temporibus.\",\n      \"manufacture_date\": \"2012-11-12\",\n      \"model_name\": \"Ratione aut aspernatur qui quis et quo.\",\n      \"nomenclature_id\": 1292076222,\n      \"notes\": \"Nihil nemo.\",\n      \"serial_number\": \"Molestiae esse sit.\",\n      \"status\": \"broken\"\n   }'")
 }
 
 func equipmentsUpdateUsage() {
@@ -706,7 +706,7 @@ func equipmentsUpdateUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments update --body '{\n      \"arrival_date\": \"1977-04-05\",\n      \"form_number\": \"Perspiciatis optio et vel temporibus.\",\n      \"location\": \"Ullam illo.\",\n      \"manufacture_date\": \"1994-09-05\",\n      \"model_name\": \"Dolores aliquam nihil repudiandae natus harum fugit.\",\n      \"nomenclature_id\": 1387246062,\n      \"notes\": \"Ab a odit aliquam praesentium.\",\n      \"serial_number\": \"Velit asperiores molestias autem.\",\n      \"status\": \"exp_sp\"\n   }' --inventory-number \"Aliquid sint molestiae in architecto.\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments update --body '{\n      \"arrival_date\": \"1991-12-29\",\n      \"form_number\": \"Qui deserunt sed.\",\n      \"location\": \"Sequi officia.\",\n      \"manufacture_date\": \"1970-04-14\",\n      \"model_name\": \"Assumenda nam et molestiae nostrum temporibus qui.\",\n      \"nomenclature_id\": 925210294,\n      \"notes\": \"Dignissimos nisi non excepturi adipisci.\",\n      \"serial_number\": \"Saepe facere ex explicabo.\",\n      \"status\": \"written_off\"\n   }' --inventory-number \"Quo quo.\"")
 }
 
 func equipmentsDeleteUsage() {
@@ -724,7 +724,7 @@ func equipmentsDeleteUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments delete --inventory-number \"Est fugiat iusto.\"")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "equipments delete --inventory-number \"In architecto quia.\"")
 }
 
 // waybillsUsage displays the usage of the waybills command and its subcommands.
@@ -773,7 +773,7 @@ func waybillsGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills get --id 1118776266")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills get --id 1247690378")
 }
 
 func waybillsCreateUsage() {
@@ -791,7 +791,7 @@ func waybillsCreateUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills create --body '{\n      \"from_dept\": 1322191570,\n      \"issue_date\": \"1984-10-23\",\n      \"items\": [\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         },\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         },\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         }\n      ],\n      \"number\": \"Ab et dolorem doloremque placeat sequi consequatur.\",\n      \"to_dept\": 1683165996\n   }'")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills create --body '{\n      \"from_dept\": 1103443439,\n      \"issue_date\": \"2015-08-27\",\n      \"items\": [\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         }\n      ],\n      \"number\": \"Non quos maiores dolor ipsa.\",\n      \"to_dept\": 56768443\n   }'")
 }
 
 func waybillsSignUsage() {
@@ -809,7 +809,7 @@ func waybillsSignUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills sign --id 1733674584")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills sign --id 1905838473")
 }
 
 func waybillsArchiveUsage() {
@@ -827,7 +827,7 @@ func waybillsArchiveUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills archive --id 1829354042")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills archive --id 772482203")
 }
 
 func waybillsDeleteUsage() {
@@ -845,7 +845,7 @@ func waybillsDeleteUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills delete --id 2106026975")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "waybills delete --id 785219184")
 }
 
 // assignmentsUsage displays the usage of the assignments command and its
@@ -877,7 +877,7 @@ func assignmentsListUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "assignments list --equipment-id 972066888 --is-active false")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "assignments list --equipment-id 1097903018 --is-active false")
 }
 
 func assignmentsGetUsage() {
@@ -895,5 +895,5 @@ func assignmentsGetUsage() {
 
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Example:")
-	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "assignments get --id 896197778")
+	fmt.Fprintf(os.Stderr, "    %s %s\n", os.Args[0], "assignments get --id 683885988")
 }

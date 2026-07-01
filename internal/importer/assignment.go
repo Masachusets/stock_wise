@@ -14,7 +14,7 @@ type assignmentRow struct {
 	inventoryNumber string
 	targetType      string
 	cardNumber      *int
-	waybillID       *int
+	departmentCode  *int
 	comment         string
 }
 
@@ -127,9 +127,8 @@ func (imp *Importer) importAssignments(ctx context.Context) error {
 			if typ == "pogk" || typ == "pogz" || typ == "opk" {
 				item.targetType = "department"
 				if deptCode, exists := deptNameToCode[deptName]; exists {
-					if wbID, exists := deptWaybillMap[deptCode]; exists {
-						item.waybillID = &wbID
-					}
+					code, _ := strconv.Atoi(deptCode)
+					item.departmentCode = &code
 				}
 			} else if isPersonName(colM) {
 				if colN != "" {
@@ -142,10 +141,10 @@ func (imp *Importer) importAssignments(ctx context.Context) error {
 				}
 			} else if typ == "warehouse" {
 				item.targetType = "warehouse"
-				for codeStr, wbID := range deptWaybillMap {
+				for codeStr := range deptWaybillMap {
 					code, _ := strconv.Atoi(codeStr)
 					if code >= 100 && code <= 199 {
-						item.waybillID = &wbID
+						item.departmentCode = &code
 						break
 					}
 				}
@@ -154,10 +153,10 @@ func (imp *Importer) importAssignments(ctx context.Context) error {
 
 		if item.targetType == "" {
 			item.targetType = "warehouse"
-			for codeStr, wbID := range deptWaybillMap {
+			for codeStr := range deptWaybillMap {
 				code, _ := strconv.Atoi(codeStr)
 				if code >= 100 && code <= 199 {
-					item.waybillID = &wbID
+					item.departmentCode = &code
 					break
 				}
 			}
@@ -175,18 +174,22 @@ func (imp *Importer) importAssignments(ctx context.Context) error {
 	defer tx.Rollback(ctx)
 
 	for _, item := range items {
+		var deptCode interface{}
+		if item.departmentCode != nil {
+			deptCode = *item.departmentCode
+		}
 		_, err := tx.Exec(ctx, `
-			INSERT INTO equipments_assignments (equipment_id, target_type, card_number, waybill_id, operator_comment, is_active)
+			INSERT INTO equipments_assignments (equipment_id, target_type, card_number, department_code, operator_comment, is_active)
 			VALUES ($1, $2, $3, $4, $5, TRUE)`,
 			item.equipmentID,
 			item.targetType,
 			item.cardNumber,
-			item.waybillID,
+			deptCode,
 			nullStr(item.comment),
 		)
 		if err != nil {
-			log.Printf("assignment insert error for %s: targetType=%s card=%v wb=%v err=%v",
-				item.inventoryNumber, item.targetType, item.cardNumber, item.waybillID, err)
+			log.Printf("assignment insert error for %s: targetType=%s card=%v dept=%v err=%v",
+				item.inventoryNumber, item.targetType, item.cardNumber, deptCode, err)
 			return err
 		}
 	}

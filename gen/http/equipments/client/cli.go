@@ -86,7 +86,7 @@ func BuildCreatePayload(equipmentsCreateBody string) (*equipments.CreateEquipmen
 	{
 		err = json.Unmarshal([]byte(equipmentsCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"arrival_date\": \"2009-04-15\",\n      \"form_number\": \"Repellat quisquam voluptatem iure et.\",\n      \"inventory_number\": \"At corporis corrupti eum et.\",\n      \"location\": \"Accusantium ipsam et ab animi harum.\",\n      \"manufacture_date\": \"1984-02-05\",\n      \"model_name\": \"Sint tempora occaecati.\",\n      \"nomenclature_id\": 1255132092,\n      \"notes\": \"Saepe facere ex explicabo.\",\n      \"serial_number\": \"Ex dicta qui asperiores quam.\",\n      \"status\": \"exp\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"arrival_date\": \"1973-06-12\",\n      \"form_number\": \"Labore ullam voluptas modi laboriosam.\",\n      \"inventory_number\": \"Recusandae ullam vitae aperiam dicta.\",\n      \"location\": \"Consequatur quisquam aut temporibus.\",\n      \"manufacture_date\": \"2012-11-12\",\n      \"model_name\": \"Ratione aut aspernatur qui quis et quo.\",\n      \"nomenclature_id\": 1292076222,\n      \"notes\": \"Nihil nemo.\",\n      \"serial_number\": \"Molestiae esse sit.\",\n      \"status\": \"broken\"\n   }'")
 		}
 		if body.ManufactureDate != nil {
 			err = goa.MergeErrors(err, goa.ValidateFormat("body.manufacture_date", *body.ManufactureDate, goa.FormatDate))
@@ -125,7 +125,7 @@ func BuildUpdatePayload(equipmentsUpdateBody string, equipmentsUpdateInventoryNu
 	{
 		err = json.Unmarshal([]byte(equipmentsUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"arrival_date\": \"1977-04-05\",\n      \"form_number\": \"Perspiciatis optio et vel temporibus.\",\n      \"location\": \"Ullam illo.\",\n      \"manufacture_date\": \"1994-09-05\",\n      \"model_name\": \"Dolores aliquam nihil repudiandae natus harum fugit.\",\n      \"nomenclature_id\": 1387246062,\n      \"notes\": \"Ab a odit aliquam praesentium.\",\n      \"serial_number\": \"Velit asperiores molestias autem.\",\n      \"status\": \"exp_sp\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"arrival_date\": \"1991-12-29\",\n      \"form_number\": \"Qui deserunt sed.\",\n      \"location\": \"Sequi officia.\",\n      \"manufacture_date\": \"1970-04-14\",\n      \"model_name\": \"Assumenda nam et molestiae nostrum temporibus qui.\",\n      \"nomenclature_id\": 925210294,\n      \"notes\": \"Dignissimos nisi non excepturi adipisci.\",\n      \"serial_number\": \"Saepe facere ex explicabo.\",\n      \"status\": \"written_off\"\n   }'")
 		}
 		if body.ManufactureDate != nil {
 			err = goa.MergeErrors(err, goa.ValidateFormat("body.manufacture_date", *body.ManufactureDate, goa.FormatDate))

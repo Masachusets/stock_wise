@@ -7,10 +7,7 @@ type Assignment struct {
 	TargetType      string
 	CardNumber      *int32
 	FullName        *string
-	WaybillNumber   *string
-	WaybillDate     *string
-	FromDeptName    *string
-	ToDeptName      *string
+	DeptName        *string
 	AssignedAt      string
 	UnassignedAt    *string
 	OperatorComment *string

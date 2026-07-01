@@ -98,10 +98,10 @@ func (r *postgresRepository) UpdateStatus(ctx context.Context, id int32, status 
 	return err
 }
 
-func (r *postgresRepository) CreateAssignment(ctx context.Context, equipmentID int32, waybillID int32) error {
+func (r *postgresRepository) CreateAssignment(ctx context.Context, equipmentID int32, departmentCode int32) error {
 	_, err := r.db.Exec(ctx,
-		`INSERT INTO equipments_assignments (equipment_id, target_type, waybill_id)
-		 VALUES ($1, 'department', $2)`, equipmentID, waybillID)
+		`INSERT INTO equipments_assignments (equipment_id, target_type, department_code)
+		 VALUES ($1, 'department', $2)`, equipmentID, departmentCode)
 	return err
 }
 

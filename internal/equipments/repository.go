@@ -31,13 +31,12 @@ func (r *postgresRepository) List(ctx context.Context, filter *ListFilter) ([]*E
 		n.code, n.name,
 		COALESCE(e.model_name, ''), e.manufacture_date::text, e.arrival_date::text,
 		e.status, e.form_number, e.location, e.notes,
-		a.target_type, c.full_name, w.number, td.name
+		a.target_type, c.full_name, d.name
 	FROM equipments e
 	LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
 	LEFT JOIN equipments_assignments a ON a.equipment_id = e.id AND a.is_active = TRUE
 	LEFT JOIN cards c ON a.card_number = c.number
-	LEFT JOIN waybills w ON a.waybill_id = w.id
-	LEFT JOIN departments td ON w.to_dept = td.code
+	LEFT JOIN departments d ON a.department_code = d.code
 	WHERE e.deleted_at IS NULL`
 
 	args := []any{}
@@ -76,13 +75,13 @@ func (r *postgresRepository) List(ctx context.Context, filter *ListFilter) ([]*E
 	for rows.Next() {
 		e := &Equipment{}
 		var invNum, status, modelName, serialNum, nomCode, nomName, mfgDate, arrDate, formNum, loc, notes interface{}
-		var targetType, empFullName, wbNumber, deptName interface{}
+		var targetType, empFullName, deptName interface{}
 		if err := rows.Scan(
 			&invNum, &serialNum,
 			&nomCode, &nomName,
 			&modelName, &mfgDate, &arrDate,
 			&status, &formNum, &loc, &notes,
-			&targetType, &empFullName, &wbNumber, &deptName,
+			&targetType, &empFullName, &deptName,
 		); err != nil {
 			return nil, err
 		}
@@ -103,10 +102,9 @@ func (r *postgresRepository) List(ctx context.Context, filter *ListFilter) ([]*E
 		}
 		if targetType != nil {
 			e.Assignment = &AssignmentInfo{
-				TargetType:   fmt.Sprintf("%v", targetType),
-				FullName:     strPtr(empFullName),
-				WaybillNumber: strPtr(wbNumber),
-				ToDeptName:   strPtr(deptName),
+				TargetType: fmt.Sprintf("%v", targetType),
+				FullName:   strPtr(empFullName),
+				DeptName:   strPtr(deptName),
 			}
 		}
 		equipments = append(equipments, e)
@@ -157,29 +155,21 @@ func (r *postgresRepository) Get(ctx context.Context, inventoryNumber string) (*
 	}
 
 	ai := &AssignmentInfo{}
-	var cardNum, wbNum, wbDate, fdName, tdName, fullName, opComment interface{}
+	var cardNum, deptName, fullName, opComment interface{}
 	err = r.db.QueryRow(ctx, `SELECT
 		a.target_type,
 		a.card_number,
 		c.full_name,
-		w.number,
-		w.issue_date::text,
-		fd.name,
-		td.name,
+		d.name,
 		a.operator_comment
 	FROM equipments_assignments a
 	LEFT JOIN cards c ON a.card_number = c.number
-	LEFT JOIN waybills w ON a.waybill_id = w.id
-	LEFT JOIN departments fd ON w.from_dept = fd.code
-	LEFT JOIN departments td ON w.to_dept = td.code
+	LEFT JOIN departments d ON a.department_code = d.code
 	WHERE a.equipment_id = $1 AND a.is_active = TRUE`, eqID).Scan(
 		&ai.TargetType,
 		&cardNum,
 		&fullName,
-		&wbNum,
-		&wbDate,
-		&fdName,
-		&tdName,
+		&deptName,
 		&opComment,
 	)
 	if err == nil {
@@ -189,10 +179,7 @@ func (r *postgresRepository) Get(ctx context.Context, inventoryNumber string) (*
 			ai.CardNumber = &cn
 		}
 		ai.FullName = strPtr(fullName)
-		ai.WaybillNumber = strPtr(wbNum)
-		ai.WaybillDate = strPtr(wbDate)
-		ai.FromDeptName = strPtr(fdName)
-		ai.ToDeptName = strPtr(tdName)
+		ai.DeptName = strPtr(deptName)
 		ai.OperatorComment = strPtr(opComment)
 		e.Assignment = ai
 	}

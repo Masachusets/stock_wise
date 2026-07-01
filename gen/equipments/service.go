@@ -51,14 +51,8 @@ type AssignmentInfo struct {
 	CardNumber *int32
 	// ФИО сотрудника
 	FullName *string
-	// Номер накладной
-	WaybillNumber *string
-	// Дата накладной
-	WaybillDate *string
-	// Подразделение-отправитель
-	FromDeptName *string
-	// Подразделение-получатель
-	ToDeptName *string
+	// Наименование подразделения
+	DeptName *string
 	// Комментарий оператора
 	OperatorComment *string
 }

@@ -405,10 +405,7 @@ func marshalEquipmentsAssignmentInfoToAssignmentInfoResponseBody(v *equipments.A
 		TargetType:      v.TargetType,
 		CardNumber:      v.CardNumber,
 		FullName:        v.FullName,
-		WaybillNumber:   v.WaybillNumber,
-		WaybillDate:     v.WaybillDate,
-		FromDeptName:    v.FromDeptName,
-		ToDeptName:      v.ToDeptName,
+		DeptName:        v.DeptName,
 		OperatorComment: v.OperatorComment,
 	}
 

@@ -27,14 +27,8 @@ type GetResponseBody struct {
 	CardNumber *int32 `form:"card_number,omitempty" json:"card_number,omitempty" xml:"card_number,omitempty"`
 	// ФИО сотрудника
 	FullName *string `form:"full_name,omitempty" json:"full_name,omitempty" xml:"full_name,omitempty"`
-	// Номер накладной
-	WaybillNumber *string `form:"waybill_number,omitempty" json:"waybill_number,omitempty" xml:"waybill_number,omitempty"`
-	// Дата накладной
-	WaybillDate *string `form:"waybill_date,omitempty" json:"waybill_date,omitempty" xml:"waybill_date,omitempty"`
-	// Подразделение-отправитель
-	FromDeptName *string `form:"from_dept_name,omitempty" json:"from_dept_name,omitempty" xml:"from_dept_name,omitempty"`
-	// Подразделение-получатель
-	ToDeptName *string `form:"to_dept_name,omitempty" json:"to_dept_name,omitempty" xml:"to_dept_name,omitempty"`
+	// Наименование подразделения
+	DeptName *string `form:"dept_name,omitempty" json:"dept_name,omitempty" xml:"dept_name,omitempty"`
 	// Дата закрепления
 	AssignedAt string `form:"assigned_at" json:"assigned_at" xml:"assigned_at"`
 	// Дата снятия
@@ -69,14 +63,8 @@ type AssignmentResponseBody struct {
 	CardNumber *int32 `form:"card_number,omitempty" json:"card_number,omitempty" xml:"card_number,omitempty"`
 	// ФИО сотрудника
 	FullName *string `form:"full_name,omitempty" json:"full_name,omitempty" xml:"full_name,omitempty"`
-	// Номер накладной
-	WaybillNumber *string `form:"waybill_number,omitempty" json:"waybill_number,omitempty" xml:"waybill_number,omitempty"`
-	// Дата накладной
-	WaybillDate *string `form:"waybill_date,omitempty" json:"waybill_date,omitempty" xml:"waybill_date,omitempty"`
-	// Подразделение-отправитель
-	FromDeptName *string `form:"from_dept_name,omitempty" json:"from_dept_name,omitempty" xml:"from_dept_name,omitempty"`
-	// Подразделение-получатель
-	ToDeptName *string `form:"to_dept_name,omitempty" json:"to_dept_name,omitempty" xml:"to_dept_name,omitempty"`
+	// Наименование подразделения
+	DeptName *string `form:"dept_name,omitempty" json:"dept_name,omitempty" xml:"dept_name,omitempty"`
 	// Дата закрепления
 	AssignedAt string `form:"assigned_at" json:"assigned_at" xml:"assigned_at"`
 	// Дата снятия
@@ -111,10 +99,7 @@ func NewGetResponseBody(res *assignments.Assignment) *GetResponseBody {
 		TargetType:      res.TargetType,
 		CardNumber:      res.CardNumber,
 		FullName:        res.FullName,
-		WaybillNumber:   res.WaybillNumber,
-		WaybillDate:     res.WaybillDate,
-		FromDeptName:    res.FromDeptName,
-		ToDeptName:      res.ToDeptName,
+		DeptName:        res.DeptName,
 		AssignedAt:      res.AssignedAt,
 		UnassignedAt:    res.UnassignedAt,
 		OperatorComment: res.OperatorComment,

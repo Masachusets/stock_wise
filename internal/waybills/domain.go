@@ -26,7 +26,7 @@ type Repository interface {
 	Create(ctx context.Context, wb *Waybill) error
 	GetEquipmentIDs(ctx context.Context, waybillID int32) ([]int32, error)
 	UpdateStatus(ctx context.Context, id int32, status string) error
-	CreateAssignment(ctx context.Context, equipmentID int32, waybillID int32) error
+	CreateAssignment(ctx context.Context, equipmentID int32, departmentCode int32) error
 	Delete(ctx context.Context, id int32) error
 	GetStatus(ctx context.Context, id int32) (string, error)
 }

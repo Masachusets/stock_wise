@@ -39,7 +39,7 @@
                         {{if eq .Assignment.TargetType "employee"}}
                             👤 {{if .Assignment.FullName}}{{.Assignment.FullName}}{{else}}—{{end}}
                         {{else if eq .Assignment.TargetType "department"}}
-                            🏢 {{if .Assignment.ToDeptName}}{{.Assignment.ToDeptName}}{{else}}{{.Assignment.WaybillNumber}}{{end}}
+                            🏢 {{if .Assignment.DeptName}}{{.Assignment.DeptName}}{{else}}—{{end}}
                         {{else if eq .Assignment.TargetType "warehouse"}}
                             📦 Склад
                         {{end}}
@@ -81,7 +81,7 @@
             </div>
             <div class="form-group">
                 <label>Модель</label>
-                <input type="text" name="model_name" placeholder="Ноутбук Clevo 15&quot;">
+                <input type="text" name="model_name" placeholder="Epson L805&quot;">
             </div>
             <div class="form-group">
                 <label>Статус *</label>

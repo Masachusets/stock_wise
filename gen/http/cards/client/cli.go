@@ -41,7 +41,7 @@ func BuildCreatePayload(cardsCreateBody string) (*cards.CreateCardPayload, error
 	{
 		err = json.Unmarshal([]byte(cardsCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"full_name\": \"Veniam officiis mollitia fugiat voluptatem numquam tempore.\",\n      \"number\": 110122744\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"full_name\": \"Repudiandae nihil repellendus in est.\",\n      \"number\": 48089892\n   }'")
 		}
 	}
 	v := &cards.CreateCardPayload{
@@ -60,7 +60,7 @@ func BuildUpdatePayload(cardsUpdateBody string, cardsUpdateNumber string) (*card
 	{
 		err = json.Unmarshal([]byte(cardsUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"full_name\": \"Quo veniam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"full_name\": \"Nam eaque similique suscipit suscipit.\"\n   }'")
 		}
 	}
 	var number int32

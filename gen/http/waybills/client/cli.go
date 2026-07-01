@@ -43,7 +43,7 @@ func BuildCreatePayload(waybillsCreateBody string) (*waybills.CreateWaybillPaylo
 	{
 		err = json.Unmarshal([]byte(waybillsCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"from_dept\": 1322191570,\n      \"issue_date\": \"1984-10-23\",\n      \"items\": [\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         },\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         },\n         {\n            \"equipment_id\": 1042284240,\n            \"waybill_id\": 1023275452\n         }\n      ],\n      \"number\": \"Ab et dolorem doloremque placeat sequi consequatur.\",\n      \"to_dept\": 1683165996\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"from_dept\": 1103443439,\n      \"issue_date\": \"2015-08-27\",\n      \"items\": [\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         },\n         {\n            \"equipment_id\": 2016065243,\n            \"waybill_id\": 664585174\n         }\n      ],\n      \"number\": \"Non quos maiores dolor ipsa.\",\n      \"to_dept\": 56768443\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.issue_date", body.IssueDate, goa.FormatDate))
 		if err != nil {

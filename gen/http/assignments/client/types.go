@@ -27,14 +27,8 @@ type GetResponseBody struct {
 	CardNumber *int32 `form:"card_number,omitempty" json:"card_number,omitempty" xml:"card_number,omitempty"`
 	// ФИО сотрудника
 	FullName *string `form:"full_name,omitempty" json:"full_name,omitempty" xml:"full_name,omitempty"`
-	// Номер накладной
-	WaybillNumber *string `form:"waybill_number,omitempty" json:"waybill_number,omitempty" xml:"waybill_number,omitempty"`
-	// Дата накладной
-	WaybillDate *string `form:"waybill_date,omitempty" json:"waybill_date,omitempty" xml:"waybill_date,omitempty"`
-	// Подразделение-отправитель
-	FromDeptName *string `form:"from_dept_name,omitempty" json:"from_dept_name,omitempty" xml:"from_dept_name,omitempty"`
-	// Подразделение-получатель
-	ToDeptName *string `form:"to_dept_name,omitempty" json:"to_dept_name,omitempty" xml:"to_dept_name,omitempty"`
+	// Наименование подразделения
+	DeptName *string `form:"dept_name,omitempty" json:"dept_name,omitempty" xml:"dept_name,omitempty"`
 	// Дата закрепления
 	AssignedAt *string `form:"assigned_at,omitempty" json:"assigned_at,omitempty" xml:"assigned_at,omitempty"`
 	// Дата снятия
@@ -69,14 +63,8 @@ type AssignmentResponseBody struct {
 	CardNumber *int32 `form:"card_number,omitempty" json:"card_number,omitempty" xml:"card_number,omitempty"`
 	// ФИО сотрудника
 	FullName *string `form:"full_name,omitempty" json:"full_name,omitempty" xml:"full_name,omitempty"`
-	// Номер накладной
-	WaybillNumber *string `form:"waybill_number,omitempty" json:"waybill_number,omitempty" xml:"waybill_number,omitempty"`
-	// Дата накладной
-	WaybillDate *string `form:"waybill_date,omitempty" json:"waybill_date,omitempty" xml:"waybill_date,omitempty"`
-	// Подразделение-отправитель
-	FromDeptName *string `form:"from_dept_name,omitempty" json:"from_dept_name,omitempty" xml:"from_dept_name,omitempty"`
-	// Подразделение-получатель
-	ToDeptName *string `form:"to_dept_name,omitempty" json:"to_dept_name,omitempty" xml:"to_dept_name,omitempty"`
+	// Наименование подразделения
+	DeptName *string `form:"dept_name,omitempty" json:"dept_name,omitempty" xml:"dept_name,omitempty"`
 	// Дата закрепления
 	AssignedAt *string `form:"assigned_at,omitempty" json:"assigned_at,omitempty" xml:"assigned_at,omitempty"`
 	// Дата снятия
@@ -108,10 +96,7 @@ func NewGetAssignmentOK(body *GetResponseBody) *assignments.Assignment {
 		TargetType:      *body.TargetType,
 		CardNumber:      body.CardNumber,
 		FullName:        body.FullName,
-		WaybillNumber:   body.WaybillNumber,
-		WaybillDate:     body.WaybillDate,
-		FromDeptName:    body.FromDeptName,
-		ToDeptName:      body.ToDeptName,
+		DeptName:        body.DeptName,
 		AssignedAt:      *body.AssignedAt,
 		UnassignedAt:    body.UnassignedAt,
 		OperatorComment: body.OperatorComment,
@@ -162,9 +147,6 @@ func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.target_type", *body.TargetType, []any{"employee", "department", "warehouse"}))
 		}
 	}
-	if body.WaybillDate != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.waybill_date", *body.WaybillDate, goa.FormatDate))
-	}
 	if body.AssignedAt != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.assigned_at", *body.AssignedAt, goa.FormatDateTime))
 	}
@@ -211,9 +193,6 @@ func ValidateAssignmentResponseBody(body *AssignmentResponseBody) (err error) {
 		if !(*body.TargetType == "employee" || *body.TargetType == "department" || *body.TargetType == "warehouse") {
 			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.target_type", *body.TargetType, []any{"employee", "department", "warehouse"}))
 		}
-	}
-	if body.WaybillDate != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.waybill_date", *body.WaybillDate, goa.FormatDate))
 	}
 	if body.AssignedAt != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.assigned_at", *body.AssignedAt, goa.FormatDateTime))

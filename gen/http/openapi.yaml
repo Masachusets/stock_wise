@@ -612,63 +612,47 @@ definitions:
             assigned_at:
                 type: string
                 description: Дата закрепления
-                example: "2005-09-13T03:51:21Z"
+                example: "1996-10-08T04:47:53Z"
                 format: date-time
             card_number:
                 type: integer
                 description: Номер карточки сотрудника
-                example: 2019554143
+                example: 1317291525
                 format: int32
-            from_dept_name:
+            dept_name:
                 type: string
-                description: Подразделение-отправитель
-                example: Ut voluptatem ea et eos blanditiis ratione.
+                description: Наименование подразделения
+                example: Sed voluptas hic omnis.
             full_name:
                 type: string
                 description: ФИО сотрудника
-                example: Cum iusto praesentium et.
+                example: Quo blanditiis eos earum.
             operator_comment:
                 type: string
                 description: Комментарий оператора
-                example: Doloremque est beatae iusto expedita.
+                example: Qui sed mollitia quis minus.
             target_type:
                 type: string
                 description: Тип закрепления
-                example: employee
+                example: department
                 enum:
                     - employee
                     - department
                     - warehouse
-            to_dept_name:
-                type: string
-                description: Подразделение-получатель
-                example: Non minima officia dicta.
             unassigned_at:
                 type: string
                 description: Дата снятия
-                example: "2002-01-02T04:35:24Z"
+                example: "1977-02-28T07:33:08Z"
                 format: date-time
-            waybill_date:
-                type: string
-                description: Дата накладной
-                example: "1986-08-24"
-                format: date
-            waybill_number:
-                type: string
-                description: Номер накладной
-                example: Quibusdam minima.
         description: Запись закрепления оборудования (история)
         example:
-            assigned_at: "2014-05-24T23:55:46Z"
-            card_number: 2112884911
-            from_dept_name: Adipisci doloribus voluptates quia.
-            full_name: Eum ipsam non et aperiam iure autem.
-            operator_comment: Eveniet velit non consequatur doloremque id.
-            target_type: employee
-            to_dept_name: Exercitationem eos sint illum quasi impedit.
-            unassigned_at: "1989-03-02T00:21:36Z"
-            waybill_date: "1974-10-05"
-            waybill_number: Facilis nulla perferendis est velit est culpa.
+            assigned_at: "1995-02-23T22:26:34Z"
+            card_number: 1361499610
+            dept_name: Incidunt et.
+            full_name: Laborum assumenda et enim laudantium voluptate totam.
+            operator_comment: Sunt provident molestias necessitatibus quae et occaecati.
+            target_type: department
+            unassigned_at: "1970-12-30T11:08:00Z"
         required:
             - target_type
             - assigned_at
@@ -679,12 +663,12 @@ definitions:
             card_number:
                 type: integer
                 description: Номер карточки сотрудника
-                example: 1725753490
+                example: 1528201536
                 format: int32
-            from_dept_name:
+            dept_name:
                 type: string
-                description: Подразделение-отправитель
-                example: Aut est aut eaque ipsam molestiae laboriosam.
+                description: Наименование подразделения
+                example: Enim a expedita et tempore.
             full_name:
                 type: string
                 description: ФИО сотрудника
@@ -692,38 +676,22 @@ definitions:
             operator_comment:
                 type: string
                 description: Комментарий оператора
-                example: Ea officiis voluptatem ratione nihil eos sequi.
+                example: Ut nam saepe.
             target_type:
                 type: string
                 description: Тип закрепления
-                example: employee
+                example: warehouse
                 enum:
                     - employee
                     - department
                     - warehouse
-            to_dept_name:
-                type: string
-                description: Подразделение-получатель
-                example: Commodi velit sint eos illo quam quo.
-            waybill_date:
-                type: string
-                description: Дата накладной
-                example: "1974-03-14"
-                format: date
-            waybill_number:
-                type: string
-                description: Номер накладной
-                example: ПОДР-100
         description: Информация о закреплении оборудования
         example:
-            card_number: 1281118136
-            from_dept_name: Excepturi et sed et at quos omnis.
+            card_number: 1124794250
+            dept_name: Neque voluptate impedit nobis ab iusto doloribus.
             full_name: Багликов А.С.
-            operator_comment: Beatae dolores vel voluptatem pariatur.
-            target_type: department
-            to_dept_name: Earum molestiae est quis sint magni.
-            waybill_date: "1982-06-09"
-            waybill_number: ПОДР-100
+            operator_comment: Hic modi deserunt inventore minima numquam.
+            target_type: employee
         required:
             - target_type
     AssignmentList:
@@ -735,68 +703,50 @@ definitions:
                 items:
                     $ref: '#/definitions/Assignment'
                 example:
-                    - assigned_at: "2002-06-24T20:29:45Z"
-                      card_number: 716412898
-                      from_dept_name: Consequatur qui praesentium est.
-                      full_name: Aut et nisi id qui qui exercitationem.
-                      operator_comment: Quam rerum corrupti.
-                      target_type: department
-                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                      unassigned_at: "2010-07-15T12:58:12Z"
-                      waybill_date: "1989-08-24"
-                      waybill_number: Illum ut non eaque.
-                    - assigned_at: "2002-06-24T20:29:45Z"
-                      card_number: 716412898
-                      from_dept_name: Consequatur qui praesentium est.
-                      full_name: Aut et nisi id qui qui exercitationem.
-                      operator_comment: Quam rerum corrupti.
-                      target_type: department
-                      to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                      unassigned_at: "2010-07-15T12:58:12Z"
-                      waybill_date: "1989-08-24"
-                      waybill_number: Illum ut non eaque.
+                    - assigned_at: "1997-08-29T06:42:05Z"
+                      card_number: 1126698923
+                      dept_name: Adipisci totam culpa dolorem omnis.
+                      full_name: Voluptas provident.
+                      operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                      target_type: warehouse
+                      unassigned_at: "2014-07-17T20:07:18Z"
+                    - assigned_at: "1997-08-29T06:42:05Z"
+                      card_number: 1126698923
+                      dept_name: Adipisci totam culpa dolorem omnis.
+                      full_name: Voluptas provident.
+                      operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                      target_type: warehouse
+                      unassigned_at: "2014-07-17T20:07:18Z"
+                    - assigned_at: "1997-08-29T06:42:05Z"
+                      card_number: 1126698923
+                      dept_name: Adipisci totam culpa dolorem omnis.
+                      full_name: Voluptas provident.
+                      operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                      target_type: warehouse
+                      unassigned_at: "2014-07-17T20:07:18Z"
         example:
             assignments:
-                - assigned_at: "2002-06-24T20:29:45Z"
-                  card_number: 716412898
-                  from_dept_name: Consequatur qui praesentium est.
-                  full_name: Aut et nisi id qui qui exercitationem.
-                  operator_comment: Quam rerum corrupti.
-                  target_type: department
-                  to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                  unassigned_at: "2010-07-15T12:58:12Z"
-                  waybill_date: "1989-08-24"
-                  waybill_number: Illum ut non eaque.
-                - assigned_at: "2002-06-24T20:29:45Z"
-                  card_number: 716412898
-                  from_dept_name: Consequatur qui praesentium est.
-                  full_name: Aut et nisi id qui qui exercitationem.
-                  operator_comment: Quam rerum corrupti.
-                  target_type: department
-                  to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                  unassigned_at: "2010-07-15T12:58:12Z"
-                  waybill_date: "1989-08-24"
-                  waybill_number: Illum ut non eaque.
-                - assigned_at: "2002-06-24T20:29:45Z"
-                  card_number: 716412898
-                  from_dept_name: Consequatur qui praesentium est.
-                  full_name: Aut et nisi id qui qui exercitationem.
-                  operator_comment: Quam rerum corrupti.
-                  target_type: department
-                  to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                  unassigned_at: "2010-07-15T12:58:12Z"
-                  waybill_date: "1989-08-24"
-                  waybill_number: Illum ut non eaque.
-                - assigned_at: "2002-06-24T20:29:45Z"
-                  card_number: 716412898
-                  from_dept_name: Consequatur qui praesentium est.
-                  full_name: Aut et nisi id qui qui exercitationem.
-                  operator_comment: Quam rerum corrupti.
-                  target_type: department
-                  to_dept_name: Quis placeat sed repudiandae hic tempora a.
-                  unassigned_at: "2010-07-15T12:58:12Z"
-                  waybill_date: "1989-08-24"
-                  waybill_number: Illum ut non eaque.
+                - assigned_at: "1997-08-29T06:42:05Z"
+                  card_number: 1126698923
+                  dept_name: Adipisci totam culpa dolorem omnis.
+                  full_name: Voluptas provident.
+                  operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                  target_type: warehouse
+                  unassigned_at: "2014-07-17T20:07:18Z"
+                - assigned_at: "1997-08-29T06:42:05Z"
+                  card_number: 1126698923
+                  dept_name: Adipisci totam culpa dolorem omnis.
+                  full_name: Voluptas provident.
+                  operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                  target_type: warehouse
+                  unassigned_at: "2014-07-17T20:07:18Z"
+                - assigned_at: "1997-08-29T06:42:05Z"
+                  card_number: 1126698923
+                  dept_name: Adipisci totam culpa dolorem omnis.
+                  full_name: Voluptas provident.
+                  operator_comment: Qui nulla libero dolorem voluptas debitis non.
+                  target_type: warehouse
+                  unassigned_at: "2014-07-17T20:07:18Z"
         required:
             - assignments
     AssignmentsGetNotFoundResponseBody:
@@ -806,7 +756,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -826,15 +776,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: get_not_found_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -853,12 +803,12 @@ definitions:
             number:
                 type: integer
                 description: Номер карточки (из КУ Ф-111)
-                example: 557276146
+                example: 1177978477
                 format: int32
         description: Карточка сотрудника
         example:
             full_name: Багликов А.С.
-            number: 910877198
+            number: 1263851071
         required:
             - number
             - full_name
@@ -872,21 +822,17 @@ definitions:
                     $ref: '#/definitions/Card'
                 example:
                     - full_name: Багликов А.С.
-                      number: 1731280678
+                      number: 274967968
                     - full_name: Багликов А.С.
-                      number: 1731280678
-                    - full_name: Багликов А.С.
-                      number: 1731280678
-                    - full_name: Багликов А.С.
-                      number: 1731280678
+                      number: 274967968
         example:
             cards:
                 - full_name: Багликов А.С.
-                  number: 1731280678
+                  number: 274967968
                 - full_name: Багликов А.С.
-                  number: 1731280678
+                  number: 274967968
                 - full_name: Багликов А.С.
-                  number: 1731280678
+                  number: 274967968
         required:
             - cards
     CardsDeleteNotFoundResponseBody:
@@ -916,15 +862,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: delete_not_found_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-            timeout: false
+            timeout: true
         required:
             - name
             - id
@@ -982,7 +928,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -998,11 +944,11 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: update_not_found_response_body result type (default view)
         example:
             fault: false
@@ -1010,7 +956,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-            timeout: false
+            timeout: true
         required:
             - name
             - id
@@ -1025,15 +971,15 @@ definitions:
             full_name:
                 type: string
                 description: ФИО
-                example: Unde totam sed veniam.
+                example: Sed ut.
             number:
                 type: integer
                 description: Номер карточки
-                example: 1274230738
+                example: 818518527
                 format: int32
         example:
-            full_name: Qui quam quasi.
-            number: 2145768753
+            full_name: Itaque laudantium fugiat magnam recusandae dolorem illum.
+            number: 1880776291
         required:
             - number
             - full_name
@@ -1044,46 +990,46 @@ definitions:
             arrival_date:
                 type: string
                 description: Дата поступления
-                example: "2008-07-12"
+                example: "2015-06-10"
                 format: date
             form_number:
                 type: string
                 description: Номер формуляра
-                example: Consequuntur et non.
+                example: Aut dolorum non aut et quod in.
             inventory_number:
                 type: string
                 description: Инвентарный номер
-                example: Nostrum iusto voluptates id voluptatem alias.
+                example: Ad ex.
             location:
                 type: string
                 description: Место установки
-                example: Iste provident sit at.
+                example: Accusamus quisquam aut voluptate voluptatem.
             manufacture_date:
                 type: string
                 description: Дата изготовления
-                example: "2010-04-28"
+                example: "1970-07-08"
                 format: date
             model_name:
                 type: string
                 description: Наименование модели
-                example: Dolores dolore saepe fuga eos alias.
+                example: Consequatur corrupti quaerat fugiat.
             nomenclature_id:
                 type: integer
                 description: ID номенклатуры
-                example: 1392460492
+                example: 1067063263
                 format: int32
             notes:
                 type: string
                 description: Примечания
-                example: Aut odit est iure laborum.
+                example: Ut maxime et blanditiis.
             serial_number:
                 type: string
                 description: Заводской номер
-                example: Aliquid sunt maxime unde est.
+                example: Odit atque ex.
             status:
                 type: string
                 description: Статус
-                example: exp_sp
+                example: exp
                 enum:
                     - exp
                     - exp_int
@@ -1091,16 +1037,16 @@ definitions:
                     - broken
                     - written_off
         example:
-            arrival_date: "1983-09-22"
-            form_number: Itaque voluptatem eveniet.
-            inventory_number: Quasi eos quo fuga corrupti.
-            location: Rerum et velit adipisci doloribus labore.
-            manufacture_date: "1992-12-08"
-            model_name: Culpa reiciendis rerum ullam dignissimos voluptatibus ut.
-            nomenclature_id: 709094659
-            notes: Voluptatibus quia.
-            serial_number: Animi quam qui.
-            status: broken
+            arrival_date: "1993-12-28"
+            form_number: Eos ratione odio.
+            inventory_number: Architecto quae iusto saepe libero.
+            location: Illum ea explicabo distinctio similique.
+            manufacture_date: "2006-08-07"
+            model_name: Enim neque eius molestiae veniam deleniti impedit.
+            nomenclature_id: 761832175
+            notes: Non non sint explicabo ut.
+            serial_number: Placeat placeat dolorum autem.
+            status: exp_sp
         required:
             - inventory_number
             - model_name
@@ -1112,12 +1058,12 @@ definitions:
             from_dept:
                 type: integer
                 description: Код подразделения-отправителя
-                example: 911499350
+                example: 1968344135
                 format: int32
             issue_date:
                 type: string
                 description: Дата документа
-                example: "2002-10-12"
+                example: "1981-12-28"
                 format: date
             items:
                 type: array
@@ -1125,29 +1071,31 @@ definitions:
                     $ref: '#/definitions/WaybillsEquipment'
                 description: Позиции накладной
                 example:
-                    - equipment_id: 1042284240
-                      waybill_id: 1023275452
-                    - equipment_id: 1042284240
-                      waybill_id: 1023275452
+                    - equipment_id: 2016065243
+                      waybill_id: 664585174
+                    - equipment_id: 2016065243
+                      waybill_id: 664585174
+                    - equipment_id: 2016065243
+                      waybill_id: 664585174
             number:
                 type: string
                 description: Номер документа
-                example: Nisi voluptatem sunt provident molestias necessitatibus quae.
+                example: Rerum dolor magnam.
             to_dept:
                 type: integer
                 description: Код подразделения-получателя
-                example: 1354745566
+                example: 1439361675
                 format: int32
         example:
-            from_dept: 1240848429
-            issue_date: "1995-02-19"
+            from_dept: 1630865970
+            issue_date: "2012-05-04"
             items:
-                - equipment_id: 1042284240
-                  waybill_id: 1023275452
-                - equipment_id: 1042284240
-                  waybill_id: 1023275452
-            number: Cum voluptas omnis amet.
-            to_dept: 1088689882
+                - equipment_id: 2016065243
+                  waybill_id: 664585174
+                - equipment_id: 2016065243
+                  waybill_id: 664585174
+            number: Neque maxime ut.
+            to_dept: 612290589
         required:
             - number
             - issue_date
@@ -1178,7 +1126,7 @@ definitions:
         example:
             code: 100
             name: СКЛАД
-            type: opk
+            type: warehouse
         required:
             - code
             - type
@@ -1194,18 +1142,27 @@ definitions:
                 example:
                     - code: 100
                       name: СКЛАД
-                      type: opk
+                      type: upogg
                     - code: 100
                       name: СКЛАД
-                      type: opk
+                      type: upogg
+                    - code: 100
+                      name: СКЛАД
+                      type: upogg
         example:
             departments:
                 - code: 100
                   name: СКЛАД
-                  type: opk
+                  type: upogg
                 - code: 100
                   name: СКЛАД
-                  type: opk
+                  type: upogg
+                - code: 100
+                  name: СКЛАД
+                  type: upogg
+                - code: 100
+                  name: СКЛАД
+                  type: upogg
         required:
             - departments
     DepartmentsGetNotFoundResponseBody:
@@ -1231,19 +1188,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: get_not_found_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: true
+            temporary: true
+            timeout: false
         required:
             - name
             - id
@@ -1258,14 +1215,14 @@ definitions:
             arrival_date:
                 type: string
                 description: Дата поступления
-                example: "2014-12-25"
+                example: "2012-03-05"
                 format: date
             assignment:
                 $ref: '#/definitions/AssignmentInfo'
             form_number:
                 type: string
                 description: Номер формуляра
-                example: Hic est illo ut adipisci optio veniam.
+                example: Et ut ea culpa.
             inventory_number:
                 type: string
                 description: Инвентарный номер
@@ -1278,7 +1235,7 @@ definitions:
             manufacture_date:
                 type: string
                 description: Дата изготовления
-                example: "1990-11-15"
+                example: "1996-02-15"
                 format: date
             model_name:
                 type: string
@@ -1289,15 +1246,15 @@ definitions:
             notes:
                 type: string
                 description: Примечания
-                example: Dignissimos dolore aut aspernatur alias cupiditate placeat.
+                example: Ipsam repellendus ea expedita autem non temporibus.
             serial_number:
                 type: string
                 description: Заводской номер
-                example: Sunt ut voluptates et.
+                example: Aut distinctio autem qui nostrum.
             status:
                 type: string
                 description: Статус
-                example: broken
+                example: written_off
                 enum:
                     - exp
                     - exp_int
@@ -1306,27 +1263,24 @@ definitions:
                     - written_off
         description: Оборудование
         example:
-            arrival_date: "2013-04-02"
+            arrival_date: "1990-04-15"
             assignment:
-                card_number: 523417916
-                from_dept_name: Deserunt et quia.
+                card_number: 195554449
+                dept_name: Qui quo voluptatem dicta.
                 full_name: Багликов А.С.
-                operator_comment: Qui non qui aliquam.
+                operator_comment: Ut minus omnis aut suscipit.
                 target_type: warehouse
-                to_dept_name: Alias maiores.
-                waybill_date: "2011-12-26"
-                waybill_number: ПОДР-100
-            form_number: Delectus quia magni non animi perspiciatis sequi.
+            form_number: Deleniti aliquid debitis esse.
             inventory_number: ИТ00205
             location: "219"
-            manufacture_date: "1998-05-20"
+            manufacture_date: "1977-06-20"
             model_name: Ноутбук Clevo 15"
             nomenclature:
                 code: 08.01.02.00.00/0041
                 name: Ноутбук Clevo 15"
-            notes: Odit expedita omnis et cum facere.
-            serial_number: Ratione odio quibusdam.
-            status: exp
+            notes: A et tenetur totam sequi.
+            serial_number: Ad sit molestias.
+            status: broken
         required:
             - inventory_number
             - model_name
@@ -1340,92 +1294,116 @@ definitions:
                 items:
                     $ref: '#/definitions/Equipment'
                 example:
-                    - arrival_date: "2002-11-13"
+                    - arrival_date: "2002-02-27"
                       assignment:
-                        card_number: 523417916
-                        from_dept_name: Deserunt et quia.
+                        card_number: 195554449
+                        dept_name: Qui quo voluptatem dicta.
                         full_name: Багликов А.С.
-                        operator_comment: Qui non qui aliquam.
+                        operator_comment: Ut minus omnis aut suscipit.
                         target_type: warehouse
-                        to_dept_name: Alias maiores.
-                        waybill_date: "2011-12-26"
-                        waybill_number: ПОДР-100
-                      form_number: Assumenda voluptatibus expedita.
+                      form_number: Quis iste velit veritatis numquam soluta.
                       inventory_number: ИТ00205
                       location: "219"
-                      manufacture_date: "2013-12-23"
+                      manufacture_date: "1988-05-21"
                       model_name: Ноутбук Clevo 15"
                       nomenclature:
                         code: 08.01.02.00.00/0041
                         name: Ноутбук Clevo 15"
-                      notes: Placeat at.
-                      serial_number: Ut qui nemo et excepturi nostrum.
-                      status: exp_sp
-                    - arrival_date: "2002-11-13"
+                      notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                      serial_number: Culpa facere voluptas explicabo quis.
+                      status: exp
+                    - arrival_date: "2002-02-27"
                       assignment:
-                        card_number: 523417916
-                        from_dept_name: Deserunt et quia.
+                        card_number: 195554449
+                        dept_name: Qui quo voluptatem dicta.
                         full_name: Багликов А.С.
-                        operator_comment: Qui non qui aliquam.
+                        operator_comment: Ut minus omnis aut suscipit.
                         target_type: warehouse
-                        to_dept_name: Alias maiores.
-                        waybill_date: "2011-12-26"
-                        waybill_number: ПОДР-100
-                      form_number: Assumenda voluptatibus expedita.
+                      form_number: Quis iste velit veritatis numquam soluta.
                       inventory_number: ИТ00205
                       location: "219"
-                      manufacture_date: "2013-12-23"
+                      manufacture_date: "1988-05-21"
                       model_name: Ноутбук Clevo 15"
                       nomenclature:
                         code: 08.01.02.00.00/0041
                         name: Ноутбук Clevo 15"
-                      notes: Placeat at.
-                      serial_number: Ut qui nemo et excepturi nostrum.
-                      status: exp_sp
+                      notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                      serial_number: Culpa facere voluptas explicabo quis.
+                      status: exp
         example:
             equipments:
-                - arrival_date: "2002-11-13"
+                - arrival_date: "2002-02-27"
                   assignment:
-                    card_number: 523417916
-                    from_dept_name: Deserunt et quia.
+                    card_number: 195554449
+                    dept_name: Qui quo voluptatem dicta.
                     full_name: Багликов А.С.
-                    operator_comment: Qui non qui aliquam.
+                    operator_comment: Ut minus omnis aut suscipit.
                     target_type: warehouse
-                    to_dept_name: Alias maiores.
-                    waybill_date: "2011-12-26"
-                    waybill_number: ПОДР-100
-                  form_number: Assumenda voluptatibus expedita.
+                  form_number: Quis iste velit veritatis numquam soluta.
                   inventory_number: ИТ00205
                   location: "219"
-                  manufacture_date: "2013-12-23"
+                  manufacture_date: "1988-05-21"
                   model_name: Ноутбук Clevo 15"
                   nomenclature:
                     code: 08.01.02.00.00/0041
                     name: Ноутбук Clevo 15"
-                  notes: Placeat at.
-                  serial_number: Ut qui nemo et excepturi nostrum.
-                  status: exp_sp
-                - arrival_date: "2002-11-13"
+                  notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                  serial_number: Culpa facere voluptas explicabo quis.
+                  status: exp
+                - arrival_date: "2002-02-27"
                   assignment:
-                    card_number: 523417916
-                    from_dept_name: Deserunt et quia.
+                    card_number: 195554449
+                    dept_name: Qui quo voluptatem dicta.
                     full_name: Багликов А.С.
-                    operator_comment: Qui non qui aliquam.
+                    operator_comment: Ut minus omnis aut suscipit.
                     target_type: warehouse
-                    to_dept_name: Alias maiores.
-                    waybill_date: "2011-12-26"
-                    waybill_number: ПОДР-100
-                  form_number: Assumenda voluptatibus expedita.
+                  form_number: Quis iste velit veritatis numquam soluta.
                   inventory_number: ИТ00205
                   location: "219"
-                  manufacture_date: "2013-12-23"
+                  manufacture_date: "1988-05-21"
                   model_name: Ноутбук Clevo 15"
                   nomenclature:
                     code: 08.01.02.00.00/0041
                     name: Ноутбук Clevo 15"
-                  notes: Placeat at.
-                  serial_number: Ut qui nemo et excepturi nostrum.
-                  status: exp_sp
+                  notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                  serial_number: Culpa facere voluptas explicabo quis.
+                  status: exp
+                - arrival_date: "2002-02-27"
+                  assignment:
+                    card_number: 195554449
+                    dept_name: Qui quo voluptatem dicta.
+                    full_name: Багликов А.С.
+                    operator_comment: Ut minus omnis aut suscipit.
+                    target_type: warehouse
+                  form_number: Quis iste velit veritatis numquam soluta.
+                  inventory_number: ИТ00205
+                  location: "219"
+                  manufacture_date: "1988-05-21"
+                  model_name: Ноутбук Clevo 15"
+                  nomenclature:
+                    code: 08.01.02.00.00/0041
+                    name: Ноутбук Clevo 15"
+                  notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                  serial_number: Culpa facere voluptas explicabo quis.
+                  status: exp
+                - arrival_date: "2002-02-27"
+                  assignment:
+                    card_number: 195554449
+                    dept_name: Qui quo voluptatem dicta.
+                    full_name: Багликов А.С.
+                    operator_comment: Ut minus omnis aut suscipit.
+                    target_type: warehouse
+                  form_number: Quis iste velit veritatis numquam soluta.
+                  inventory_number: ИТ00205
+                  location: "219"
+                  manufacture_date: "1988-05-21"
+                  model_name: Ноутбук Clevo 15"
+                  nomenclature:
+                    code: 08.01.02.00.00/0041
+                    name: Ноутбук Clevo 15"
+                  notes: Saepe magnam facilis assumenda eos voluptatem voluptatem.
+                  serial_number: Culpa facere voluptas explicabo quis.
+                  status: exp
         required:
             - equipments
     EquipmentsCreateConflictResponseBody:
@@ -1451,18 +1429,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: create_conflict_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: false
         required:
             - name
@@ -1478,7 +1456,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1498,14 +1476,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: delete_not_found_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -1544,11 +1522,11 @@ definitions:
                 example: false
         description: get_not_found_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -1580,14 +1558,14 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: update_conflict_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -1607,7 +1585,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1623,18 +1601,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
         description: update_not_found_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -1687,8 +1665,6 @@ definitions:
                   name: Ноутбук Clevo 15"
                 - code: 08.01.02.00.00/0041
                   name: Ноутбук Clevo 15"
-                - code: 08.01.02.00.00/0041
-                  name: Ноутбук Clevo 15"
         required:
             - nomenclatures
     NomenclaturesGetNotFoundResponseBody:
@@ -1698,7 +1674,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1721,12 +1697,12 @@ definitions:
                 example: false
         description: get_not_found_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -1741,9 +1717,9 @@ definitions:
             full_name:
                 type: string
                 description: ФИО
-                example: Voluptatem laborum rem consequatur ea quo itaque.
+                example: Repellat dignissimos.
         example:
-            full_name: Aliquid debitis esse nostrum.
+            full_name: Illum distinctio saepe deleniti in.
     UpdateEquipmentPayload:
         title: UpdateEquipmentPayload
         type: object
@@ -1751,42 +1727,42 @@ definitions:
             arrival_date:
                 type: string
                 description: Дата поступления
-                example: "2014-02-08"
+                example: "1973-07-13"
                 format: date
             form_number:
                 type: string
                 description: Номер формуляра
-                example: Eveniet provident aliquid.
+                example: Aliquid sunt maxime unde est.
             location:
                 type: string
                 description: Место установки
-                example: Alias in aliquam.
+                example: Sunt dolores dolore saepe fuga eos.
             manufacture_date:
                 type: string
                 description: Дата изготовления
-                example: "1993-08-14"
+                example: "1989-08-04"
                 format: date
             model_name:
                 type: string
                 description: Наименование модели
-                example: Necessitatibus quidem ipsa.
+                example: Dolorem nihil mollitia veritatis.
             nomenclature_id:
                 type: integer
                 description: ID номенклатуры
-                example: 2023404938
+                example: 1154829763
                 format: int32
             notes:
                 type: string
                 description: Примечания
-                example: Ratione tempora repudiandae modi et.
+                example: Et unde.
             serial_number:
                 type: string
                 description: Заводской номер
-                example: Aut cupiditate modi rerum dolor.
+                example: Expedita odit labore odit maiores.
             status:
                 type: string
                 description: Статус
-                example: exp_sp
+                example: written_off
                 enum:
                     - exp
                     - exp_int
@@ -1794,15 +1770,15 @@ definitions:
                     - broken
                     - written_off
         example:
-            arrival_date: "2004-08-13"
-            form_number: Pariatur culpa voluptates vero.
-            location: Illo vero soluta sunt.
-            manufacture_date: "1999-07-18"
-            model_name: Qui quos voluptatem consequatur.
-            nomenclature_id: 772151050
-            notes: Minima ducimus quis voluptas voluptatibus voluptatem assumenda.
-            serial_number: Et reiciendis minus earum repellat.
-            status: exp_sp
+            arrival_date: "1985-12-22"
+            form_number: Fuga corrupti beatae.
+            location: Quam qui porro aperiam culpa reiciendis rerum.
+            manufacture_date: "1991-03-29"
+            model_name: Eius ratione alias eum eos blanditiis.
+            nomenclature_id: 1638910365
+            notes: Dignissimos voluptatibus ut et qui aut quidem.
+            serial_number: Et est dolores aliquam.
+            status: exp
     Waybill:
         title: Waybill
         type: object
@@ -1810,12 +1786,12 @@ definitions:
             from_dept:
                 type: integer
                 description: Код подразделения-отправителя
-                example: 817075032
+                example: 1904907712
                 format: int32
             issue_date:
                 type: string
                 description: Дата документа
-                example: "1988-08-16"
+                example: "1990-09-11"
                 format: date
             items:
                 type: array
@@ -1823,10 +1799,14 @@ definitions:
                     $ref: '#/definitions/WaybillsEquipment'
                 description: Позиции накладной
                 example:
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
             number:
                 type: string
                 description: Номер документа
@@ -1842,22 +1822,24 @@ definitions:
             to_dept:
                 type: integer
                 description: Код подразделения-получателя
-                example: 979882996
+                example: 544755368
                 format: int32
         description: Накладная
         example:
-            from_dept: 1015287474
-            issue_date: "1974-03-26"
+            from_dept: 729853037
+            issue_date: "2009-02-16"
             items:
-                - equipment_id: 390105049
-                  waybill_id: 1752360764
-                - equipment_id: 390105049
-                  waybill_id: 1752360764
-                - equipment_id: 390105049
-                  waybill_id: 1752360764
+                - equipment_id: 1232401099
+                  waybill_id: 356114870
+                - equipment_id: 1232401099
+                  waybill_id: 356114870
+                - equipment_id: 1232401099
+                  waybill_id: 356114870
+                - equipment_id: 1232401099
+                  waybill_id: 356114870
             number: Накладная №123
-            status: draft
-            to_dept: 1073925254
+            status: archived
+            to_dept: 537770379
         required:
             - number
             - issue_date
@@ -1871,104 +1853,88 @@ definitions:
                 items:
                     $ref: '#/definitions/Waybill'
                 example:
-                    - from_dept: 1225071720
-                      issue_date: "1994-12-14"
+                    - from_dept: 1203015280
+                      issue_date: "1987-12-11"
                       items:
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
                       number: Накладная №123
                       status: archived
-                      to_dept: 629113946
-                    - from_dept: 1225071720
-                      issue_date: "1994-12-14"
+                      to_dept: 687976267
+                    - from_dept: 1203015280
+                      issue_date: "1987-12-11"
                       items:
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
                       number: Накладная №123
                       status: archived
-                      to_dept: 629113946
-                    - from_dept: 1225071720
-                      issue_date: "1994-12-14"
+                      to_dept: 687976267
+                    - from_dept: 1203015280
+                      issue_date: "1987-12-11"
                       items:
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
                       number: Накладная №123
                       status: archived
-                      to_dept: 629113946
-                    - from_dept: 1225071720
-                      issue_date: "1994-12-14"
+                      to_dept: 687976267
+                    - from_dept: 1203015280
+                      issue_date: "1987-12-11"
                       items:
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
-                        - equipment_id: 390105049
-                          waybill_id: 1752360764
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
+                        - equipment_id: 1232401099
+                          waybill_id: 356114870
                       number: Накладная №123
                       status: archived
-                      to_dept: 629113946
+                      to_dept: 687976267
         example:
             waybills:
-                - from_dept: 1225071720
-                  issue_date: "1994-12-14"
+                - from_dept: 1203015280
+                  issue_date: "1987-12-11"
                   items:
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
                   number: Накладная №123
                   status: archived
-                  to_dept: 629113946
-                - from_dept: 1225071720
-                  issue_date: "1994-12-14"
+                  to_dept: 687976267
+                - from_dept: 1203015280
+                  issue_date: "1987-12-11"
                   items:
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
                   number: Накладная №123
                   status: archived
-                  to_dept: 629113946
-                - from_dept: 1225071720
-                  issue_date: "1994-12-14"
+                  to_dept: 687976267
+                - from_dept: 1203015280
+                  issue_date: "1987-12-11"
                   items:
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
                   number: Накладная №123
                   status: archived
-                  to_dept: 629113946
-                - from_dept: 1225071720
-                  issue_date: "1994-12-14"
+                  to_dept: 687976267
+                - from_dept: 1203015280
+                  issue_date: "1987-12-11"
                   items:
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
-                    - equipment_id: 390105049
-                      waybill_id: 1752360764
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
+                    - equipment_id: 1232401099
+                      waybill_id: 356114870
                   number: Накладная №123
                   status: archived
-                  to_dept: 629113946
+                  to_dept: 687976267
         required:
             - waybills
     WaybillsArchiveInvalidStatusResponseBody:
@@ -1978,7 +1944,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1998,14 +1964,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: archive_invalid_status_response_body result type (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -2044,11 +2010,11 @@ definitions:
                 example: false
         description: archive_not_found_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: false
         required:
             - name
@@ -2091,8 +2057,8 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -2107,7 +2073,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2127,14 +2093,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: delete_not_found_response_body result type (default view)
         example:
             fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: false
         required:
             - name
@@ -2150,17 +2116,17 @@ definitions:
             equipment_id:
                 type: integer
                 description: ID оборудования
-                example: 1095981643
+                example: 1524177813
                 format: int32
             waybill_id:
                 type: integer
                 description: ID накладной
-                example: 1102909665
+                example: 684370485
                 format: int32
         description: Позиция накладной (связь накладной и оборудования)
         example:
-            equipment_id: 839712160
-            waybill_id: 946763664
+            equipment_id: 1179912580
+            waybill_id: 1208686086
         required:
             - waybill_id
             - equipment_id
@@ -2191,14 +2157,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: get_not_found_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -2214,7 +2180,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2230,18 +2196,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: sign_invalid_status_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: true
         required:
             - name
@@ -2280,12 +2246,12 @@ definitions:
                 example: true
         description: sign_not_found_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-            timeout: false
+            timeout: true
         required:
             - name
             - id

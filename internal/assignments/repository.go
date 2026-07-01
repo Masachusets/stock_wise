@@ -20,18 +20,13 @@ func (r *postgresRepository) List(ctx context.Context, equipmentID *int32, isAct
 		a.target_type,
 		a.card_number,
 		c.full_name,
-		w.number,
-		w.issue_date::text,
-		fd.name,
-		td.name,
+		d.name,
 		a.assigned_at::text,
 		a.unassigned_at::text,
 		a.operator_comment
 	FROM equipments_assignments a
 	LEFT JOIN cards c ON a.card_number = c.number
-	LEFT JOIN waybills w ON a.waybill_id = w.id
-	LEFT JOIN departments fd ON w.from_dept = fd.code
-	LEFT JOIN departments td ON w.to_dept = td.code
+	LEFT JOIN departments d ON a.department_code = d.code
 	WHERE 1=1`
 
 	args := []any{}
@@ -63,10 +58,7 @@ func (r *postgresRepository) List(ctx context.Context, equipmentID *int32, isAct
 			&a.TargetType,
 			&a.CardNumber,
 			&a.FullName,
-			&a.WaybillNumber,
-			&a.WaybillDate,
-			&a.FromDeptName,
-			&a.ToDeptName,
+			&a.DeptName,
 			&a.AssignedAt,
 			&a.UnassignedAt,
 			&a.OperatorComment,
@@ -84,26 +76,18 @@ func (r *postgresRepository) Get(ctx context.Context, id int32) (*Assignment, er
 		a.target_type,
 		a.card_number,
 		c.full_name,
-		w.number,
-		w.issue_date::text,
-		fd.name,
-		td.name,
+		d.name,
 		a.assigned_at::text,
 		a.unassigned_at::text,
 		a.operator_comment
 	FROM equipments_assignments a
 	LEFT JOIN cards c ON a.card_number = c.number
-	LEFT JOIN waybills w ON a.waybill_id = w.id
-	LEFT JOIN departments fd ON w.from_dept = fd.code
-	LEFT JOIN departments td ON w.to_dept = td.code
+	LEFT JOIN departments d ON a.department_code = d.code
 	WHERE a.id = $1`, id).Scan(
 		&a.TargetType,
 		&a.CardNumber,
 		&a.FullName,
-		&a.WaybillNumber,
-		&a.WaybillDate,
-		&a.FromDeptName,
-		&a.ToDeptName,
+		&a.DeptName,
 		&a.AssignedAt,
 		&a.UnassignedAt,
 		&a.OperatorComment,
