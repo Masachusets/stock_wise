@@ -14,6 +14,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// normalizeDate конвертирует "YYYY-MM" в "YYYY-MM-01" для PostgreSQL DATE.
+func normalizeDate(s *string) *string {
+	if s == nil || *s == "" {
+		return nil
+	}
+	v := *s
+	if len(v) == 7 { // "YYYY-MM"
+		v += "-01"
+	}
+	return &v
+}
+
 var funcMap = template.FuncMap{
 	"statusLabel": func(s string) string {
 		labels := map[string]string{
@@ -184,8 +196,8 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			Status:          body.Status,
 			NomenclatureID:  body.NomenclatureID,
 			SerialNumber:    body.SerialNumber,
-			ManufactureDate: body.ManufactureDate,
-			ArrivalDate:     body.ArrivalDate,
+			ManufactureDate: normalizeDate(body.ManufactureDate),
+			ArrivalDate:     normalizeDate(body.ArrivalDate),
 			Notes:           body.Notes,
 		}
 
@@ -229,7 +241,7 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 	})
 
 	mux.HandleFunc("/equipments/update", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
+		if r.Method != "PUT" {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
@@ -253,8 +265,8 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			Status:          body.Status,
 			NomenclatureID:  body.NomenclatureID,
 			SerialNumber:    body.SerialNumber,
-			ManufactureDate: body.ManufactureDate,
-			ArrivalDate:     body.ArrivalDate,
+			ManufactureDate: normalizeDate(body.ManufactureDate),
+			ArrivalDate:     normalizeDate(body.ArrivalDate),
 			Notes:           body.Notes,
 		}
 		if _, err := eqSvc.Update(r.Context(), payload); err != nil {
