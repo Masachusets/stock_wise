@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,17 +16,17 @@ import (
 	cards "github.com/Masachusets/stock_wise/gen/cards"
 	departments "github.com/Masachusets/stock_wise/gen/departments"
 	equipments "github.com/Masachusets/stock_wise/gen/equipments"
-	nomenclatures "github.com/Masachusets/stock_wise/gen/nomenclatures"
-	waybills "github.com/Masachusets/stock_wise/gen/waybills"
 	assignmentssvr "github.com/Masachusets/stock_wise/gen/http/assignments/server"
 	cardssvr "github.com/Masachusets/stock_wise/gen/http/cards/server"
 	departmentssvr "github.com/Masachusets/stock_wise/gen/http/departments/server"
 	equipmentssvr "github.com/Masachusets/stock_wise/gen/http/equipments/server"
 	nomenclaturessvr "github.com/Masachusets/stock_wise/gen/http/nomenclatures/server"
 	waybillssvr "github.com/Masachusets/stock_wise/gen/http/waybills/server"
-	"github.com/Masachusets/stock_wise/internal/config"
+	nomenclatures "github.com/Masachusets/stock_wise/gen/nomenclatures"
+	waybills "github.com/Masachusets/stock_wise/gen/waybills"
 	svcassignments "github.com/Masachusets/stock_wise/internal/assignments"
 	svccards "github.com/Masachusets/stock_wise/internal/cards"
+	"github.com/Masachusets/stock_wise/internal/config"
 	svcdepartments "github.com/Masachusets/stock_wise/internal/departments"
 	svcequipments "github.com/Masachusets/stock_wise/internal/equipments"
 	svcnomenclatures "github.com/Masachusets/stock_wise/internal/nomenclatures"
@@ -80,6 +82,8 @@ func (w *statusWriter) WriteHeader(code int) {
 
 // runApp инициализирует и запускает HTTP-сервер StockWise.
 func runApp(cfg *config.Config) error {
+ctx := context.Background()
+	
 	// Настройка уровня логирования
 	var level slog.Level
 	if err := level.UnmarshalText([]byte(cfg.Log)); err != nil {
@@ -90,13 +94,13 @@ func runApp(cfg *config.Config) error {
 	slog.Info("starting server", "port", cfg.Port)
 
 	// Подключение к PostgreSQL
-	pool, err := pgxpool.New(context.Background(), cfg.DB)
+	pool, err := pgxpool.New(ctx, cfg.DB)
 	if err != nil {
 		return fmt.Errorf("connect to database: %w", err)
 	}
 	defer pool.Close()
 
-	if err := pool.Ping(context.Background()); err != nil {
+	if err := pool.Ping(ctx); err != nil {
 		return fmt.Errorf("ping database: %w", err)
 	}
 	slog.Info("connected to PostgreSQL")
@@ -184,26 +188,25 @@ func runApp(cfg *config.Config) error {
 		ReadHeaderTimeout: 60 * time.Second,
 	}
 
-	// Обработка сигналов (SIGINT/SIGTERM) для graceful shutdown
-	errc := make(chan error, 1)
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errc <- fmt.Errorf("%s", <-c)
-	}()
+	// Контекст сигналов (SIGINT/SIGTERM) для graceful shutdown
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	// Запуск HTTP-сервера
 	go func() {
 		slog.Info("server listening", "port", cfg.Port)
-		errc <- srv.ListenAndServe()
+		if err := srv.ListenAndServe(); err != nil &&
+		errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("server error: %v", err)
+		}
 	}()
 
 	// Ожидание сигнала или ошибки сервера
-	<-errc
+	<-ctx.Done()
 	slog.Info("shutting down server")
 
 	// Graceful shutdown с таймаутом 30 секунд
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
