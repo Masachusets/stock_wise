@@ -5,7 +5,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h2>{{.Equipment.ModelName}}</h2>
+        <h2>{{if .Equipment.Nomenclature}}{{.Equipment.Nomenclature.Name}}{{if .Equipment.ModelName}} / {{.Equipment.ModelName}}{{end}}{{else if .Equipment.ModelName}}{{.Equipment.ModelName}}{{else}}—{{end}}</h2>
         <div>
             <span class="badge badge-{{.Equipment.Status}}">{{statusLabel .Equipment.Status}}</span>
             <button class="btn btn-primary" onclick="showEditModal()">Изменить</button>
@@ -27,8 +27,12 @@
             {{end}}
             {{if .Equipment.Nomenclature}}
             <div class="info-item">
-                <label>Номенклатура</label>
-                <span>{{.Equipment.Nomenclature.Code}} — {{.Equipment.Nomenclature.Name}}</span>
+                <label>Наименование</label>
+                <span>{{.Equipment.Nomenclature.Name}}</span>
+            </div>
+            <div class="info-item">
+                <label>Код номенклатуры</label>
+                <span>{{.Equipment.Nomenclature.Code}}</span>
             </div>
             {{end}}
             {{if .Equipment.ManufactureDate}}
@@ -137,11 +141,11 @@
             </div>
             <div class="form-group">
                 <label>Дата изготовления</label>
-                <input type="date" name="manufacture_date" value="{{.Equipment.ManufactureDate}}">
+                <input type="month" name="manufacture_date" value="{{.Equipment.ManufactureDate}}">
             </div>
             <div class="form-group">
                 <label>Дата поступления</label>
-                <input type="date" name="arrival_date" value="{{.Equipment.ArrivalDate}}">
+                <input type="month" name="arrival_date" value="{{.Equipment.ArrivalDate}}">
             </div>
             <div class="form-group">
                 <label>Примечания</label>
