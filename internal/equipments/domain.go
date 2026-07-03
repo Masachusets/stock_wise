@@ -48,4 +48,62 @@ type Repository interface {
 	Create(ctx context.Context, eq *Equipment) error
 	Update(ctx context.Context, eq *Equipment) error
 	Delete(ctx context.Context, inventoryNumber string) error
+	ListForWeb(ctx context.Context, filter *ListFilter) ([]*EquipmentListItem, error)
+	GetForWeb(ctx context.Context, inventoryNumber string) (*EquipmentDetail, error)
+	ListNomenclatures(ctx context.Context) ([]*NomenclatureOption, error)
+	CreateWithAssignment(ctx context.Context, eq *Equipment, departmentCode int) error
+	ListDeleted(ctx context.Context) ([]*EquipmentDeletedItem, error)
+}
+
+// EquipmentListItem — элемент списка оборудования для web-интерфейса.
+type EquipmentListItem struct {
+	InventoryNumber string
+	ModelName       string
+	Status          string
+	Location        *string
+	Nomenclature    *NomenclatureInfo
+	Assignment      *AssignmentInfo
+}
+
+// EquipmentDetail — детальная информация об оборудовании для web-интерфейса.
+type EquipmentDetail struct {
+	InventoryNumber string
+	SerialNumber    *string
+	ModelName       string
+	ManufactureDate *string
+	ArrivalDate     *string
+	Status          string
+	FormNumber      *string
+	Location        *string
+	Notes           *string
+	Nomenclature    *NomenclatureInfo
+	Assignment      *AssignmentInfo
+}
+
+// EquipmentDeletedItem — удалённое оборудование.
+type EquipmentDeletedItem struct {
+	InventoryNumber string
+	ModelName       string
+	NomCode         string
+	NomName         string
+	Status          string
+	DeletedAt       string
+}
+
+// NomenclatureOption — опция для выпадающего списка номенклатур.
+type NomenclatureOption struct {
+	ID   int32
+	Code string
+	Name string
+}
+
+// WebService интерфейс для web-хэндлеров оборудования.
+type WebService interface {
+	ListForWeb(ctx context.Context, filter *ListFilter) ([]*EquipmentListItem, error)
+	GetForWeb(ctx context.Context, inventoryNumber string) (*EquipmentDetail, error)
+	ListNomenclatures(ctx context.Context) ([]*NomenclatureOption, error)
+	CreateWithAssignment(ctx context.Context, eq *Equipment, departmentCode int) error
+	Update(ctx context.Context, eq *Equipment) error
+	Delete(ctx context.Context, inventoryNumber string) error
+	ListDeleted(ctx context.Context) ([]*EquipmentDeletedItem, error)
 }

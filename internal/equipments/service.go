@@ -6,15 +6,15 @@ import (
 	gen "github.com/Masachusets/stock_wise/gen/equipments"
 )
 
-type service struct {
+type Service struct {
 	repo Repository
 }
 
-func New(repo Repository) gen.Service {
-	return &service{repo: repo}
+func New(repo Repository) *Service {
+	return &Service{repo: repo}
 }
 
-func (s *service) List(ctx context.Context, p *gen.ListPayload) (res *gen.EquipmentList, err error) {
+func (s *Service) List(ctx context.Context, p *gen.ListPayload) (res *gen.EquipmentList, err error) {
 	filter := &ListFilter{
 		Status:         p.Status,
 		NomenclatureID: p.NomenclatureID,
@@ -34,7 +34,7 @@ func (s *service) List(ctx context.Context, p *gen.ListPayload) (res *gen.Equipm
 	return &gen.EquipmentList{Equipments: eqs}, nil
 }
 
-func (s *service) Get(ctx context.Context, p *gen.GetPayload) (res *gen.Equipment, err error) {
+func (s *Service) Get(ctx context.Context, p *gen.GetPayload) (res *gen.Equipment, err error) {
 	e, err := s.repo.Get(ctx, p.InventoryNumber)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (s *service) Get(ctx context.Context, p *gen.GetPayload) (res *gen.Equipmen
 	return convertToGen(e), nil
 }
 
-func (s *service) Create(ctx context.Context, p *gen.CreateEquipmentPayload) (res *gen.Equipment, err error) {
+func (s *Service) Create(ctx context.Context, p *gen.CreateEquipmentPayload) (res *gen.Equipment, err error) {
 	e := &Equipment{
 		InventoryNumber: p.InventoryNumber,
 		SerialNumber:    p.SerialNumber,
@@ -61,7 +61,7 @@ func (s *service) Create(ctx context.Context, p *gen.CreateEquipmentPayload) (re
 	return s.Get(ctx, &gen.GetPayload{InventoryNumber: p.InventoryNumber})
 }
 
-func (s *service) Update(ctx context.Context, p *gen.UpdateEquipmentPayload) (res *gen.Equipment, err error) {
+func (s *Service) Update(ctx context.Context, p *gen.UpdateEquipmentPayload) (res *gen.Equipment, err error) {
 	e, err := s.repo.Get(ctx, p.InventoryNumber)
 	if err != nil {
 		return nil, err
@@ -98,8 +98,36 @@ func (s *service) Update(ctx context.Context, p *gen.UpdateEquipmentPayload) (re
 	return s.Get(ctx, &gen.GetPayload{InventoryNumber: p.InventoryNumber})
 }
 
-func (s *service) Delete(ctx context.Context, p *gen.DeletePayload) error {
+func (s *Service) Delete(ctx context.Context, p *gen.DeletePayload) error {
 	return s.repo.Delete(ctx, p.InventoryNumber)
+}
+
+func (s *Service) DeleteByInvNum(ctx context.Context, inventoryNumber string) error {
+	return s.repo.Delete(ctx, inventoryNumber)
+}
+
+func (s *Service) UpdateByDomain(ctx context.Context, eq *Equipment) error {
+	return s.repo.Update(ctx, eq)
+}
+
+func (s *Service) ListForWeb(ctx context.Context, filter *ListFilter) ([]*EquipmentListItem, error) {
+	return s.repo.ListForWeb(ctx, filter)
+}
+
+func (s *Service) GetForWeb(ctx context.Context, inventoryNumber string) (*EquipmentDetail, error) {
+	return s.repo.GetForWeb(ctx, inventoryNumber)
+}
+
+func (s *Service) ListNomenclatures(ctx context.Context) ([]*NomenclatureOption, error) {
+	return s.repo.ListNomenclatures(ctx)
+}
+
+func (s *Service) CreateWithAssignment(ctx context.Context, eq *Equipment, departmentCode int) error {
+	return s.repo.CreateWithAssignment(ctx, eq, departmentCode)
+}
+
+func (s *Service) ListDeleted(ctx context.Context) ([]*EquipmentDeletedItem, error) {
+	return s.repo.ListDeleted(ctx)
 }
 
 func convertToGen(e *Equipment) *gen.Equipment {
