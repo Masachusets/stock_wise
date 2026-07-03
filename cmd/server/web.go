@@ -91,13 +91,17 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 		}
 
 		// Получить список номенклатур для формы
-		nomRows, err := pool.Query(r.Context(), "SELECT id, code, name FROM nomenclatures ORDER BY code")
+		nomRows, err := pool.Query(
+			r.Context(), 
+			"SELECT id, code, name FROM nomenclatures ORDER BY code",
+		)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		defer nomRows.Close()
 
+		
 		type nomItem struct {
 			ID   int32
 			Code string
