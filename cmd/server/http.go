@@ -131,26 +131,6 @@ func handleHTTPServer(
 	waybillssvr.Mount(mux, wbSvr)
 	assignmentssvr.Mount(mux, assignSvr)
 
-	// Вывод смонтированных маршрутов
-	for _, m := range nomSvr.Mounts {
-		log.Infof(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-	for _, m := range deptSvr.Mounts {
-		log.Debugf(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-	for _, m := range cardsSvr.Mounts {
-		log.Debugf(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-	for _, m := range equipSvr.Mounts {
-		log.Debugf(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-	for _, m := range wbSvr.Mounts {
-		log.Debugf(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-	for _, m := range assignSvr.Mounts {
-		log.Debugf(ctx, "route method=%v verb=%v pattern=%v", m.Method, m.Verb, m.Pattern)
-	}
-
 	// Создание HTTP-сервера
 	rootMux := http.NewServeMux()
 
@@ -204,10 +184,8 @@ func handleHTTPServer(
 }
 
 // errorHandler возвращает функцию, которая записывает и регистрирует заданную ошибку.
-// Функция также записывает и регистрирует уникальный идентификатор ошибки,
-// чтобы можно было установить связь.
 func errorHandler(logCtx context.Context) func(context.Context, http.ResponseWriter, error) {
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
-		log.Printf(logCtx, "ERROR: %s", err.Error())
+		log.Errorf(logCtx, err, "request error: %v", err)
 	}
 }
