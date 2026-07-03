@@ -188,13 +188,18 @@ func (r *postgresRepository) Get(ctx context.Context, inventoryNumber string) (*
 }
 
 func (r *postgresRepository) Create(ctx context.Context, eq *Equipment) error {
-	_, err := r.db.Exec(ctx, `INSERT INTO equipments
+	tag, err := r.db.Exec(ctx, `INSERT INTO equipments
 		(inventory_number, serial_number, nomenclature_id, model_name, manufacture_date, arrival_date, status, form_number, location, notes)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-		ON CONFLICT (inventory_number) DO NOTHING`,
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		eq.InventoryNumber, eq.SerialNumber, eq.NomenclatureID, eq.ModelName,
 		eq.ManufactureDate, eq.ArrivalDate, eq.Status, eq.FormNumber, eq.Location, eq.Notes)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return fmt.Errorf("оборудование с инвентарным номером %s уже существует", eq.InventoryNumber)
+	}
+	return nil
 }
 
 func (r *postgresRepository) Update(ctx context.Context, eq *Equipment) error {
