@@ -12,6 +12,7 @@ import (
 	"github.com/Masachusets/stock_wise/gen/equipments"
 	"github.com/Masachusets/stock_wise/gen/waybills"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"goa.design/clue/log"
 )
 
 // normalizeDate конвертирует "YYYY-MM" в "YYYY-MM-01" для PostgreSQL DATE.
@@ -133,6 +134,19 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 			http.NotFound(w, r)
 			return
 		}
+
+		// DELETE — удаление оборудования
+		if r.Method == "DELETE" {
+			if err := eqSvc.Delete(r.Context(), &equipments.DeletePayload{InventoryNumber: invNum}); err != nil {
+				log.Errorf(r.Context(), err, "delete equipment %s", invNum)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// GET — просмотр карточки оборудования
 		res, err := eqSvc.Get(r.Context(), &equipments.GetPayload{InventoryNumber: invNum})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
@@ -222,25 +236,6 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 				 VALUES ($1, 'warehouse', $2)`, eqID, deptCode)
 		}
 
-		w.WriteHeader(http.StatusOK)
-	})
-
-	mux.HandleFunc("/equipments/delete", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-		var body struct {
-			InventoryNumber string `json:"inventory_number"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
-			return
-		}
-		if err := eqSvc.Delete(r.Context(), &equipments.DeletePayload{InventoryNumber: body.InventoryNumber}); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 		w.WriteHeader(http.StatusOK)
 	})
 

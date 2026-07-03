@@ -40,7 +40,7 @@ function hideEditModal() {
 
 function deleteEquipment(invNum) {
     if (!confirm('Удалить оборудование ' + invNum + '?')) return;
-    fetch('/equipments/' + invNum + '/delete', { method: 'POST' })
+    fetch('/equipments/' + invNum, { method: 'DELETE' })
         .then(r => {
             if (r.ok) window.location = '/equipments';
             else r.text().then(t => alert('Ошибка: ' + t));
