@@ -47,7 +47,7 @@ func handleHTTPServer(
 
 	// Регистрация веб-хэндлеров (шаблоны + статика)
 	tpl := web.LoadTemplates()
-	web.RegisterRoutes(rootMux, tpl, pool, services.Equipments, services.WaybillsSvc)
+	web.RegisterRoutes(rootMux, tpl, services.EquipmentsSvc, services.WaybillsSvc)
 
 	// Монтирование API на /api/
 	rootMux.Handle("/api/", http.StripPrefix("/api", apiMux))

@@ -17,25 +17,29 @@ import (
 )
 
 type Services struct {
-	Nomenclatures nomenclatures.Service
-	Departments   departments.Service
-	Cards         cards.Service
-	Equipments    equipments.Service
-	Waybills      waybills.Service
-	WaybillsSvc   svcwaybills.WebService
-	Assignments   assignments.Service
+	Nomenclatures  nomenclatures.Service
+	Departments    departments.Service
+	Cards          cards.Service
+	Equipments     equipments.Service
+	EquipmentsSvc  *svcequipments.Service
+	Waybills       waybills.Service
+	WaybillsSvc    svcwaybills.WebService
+	Assignments    assignments.Service
 }
 
 func NewServices(pool *pgxpool.Pool) *Services {
+	eqRepo := svcequipments.NewPostgresRepository(pool)
+	eqSvc := svcequipments.New(eqRepo)
 	wbRepo := svcwaybills.NewPostgresRepository(pool)
 	wbSvc := svcwaybills.New(wbRepo)
 	return &Services{
-		Nomenclatures: svcnomenclatures.New(svcnomenclatures.NewPostgresRepository(pool)),
-		Departments:   svcdepartments.New(svcdepartments.NewPostgresRepository(pool)),
-		Cards:         svccards.New(svccards.NewPostgresRepository(pool)),
-		Equipments:    svcequipments.New(svcequipments.NewPostgresRepository(pool)),
-		Waybills:      wbSvc,
-		WaybillsSvc:   wbSvc,
-		Assignments:   svcassignments.New(svcassignments.NewPostgresRepository(pool)),
+		Nomenclatures:  svcnomenclatures.New(svcnomenclatures.NewPostgresRepository(pool)),
+		Departments:    svcdepartments.New(svcdepartments.NewPostgresRepository(pool)),
+		Cards:          svccards.New(svccards.NewPostgresRepository(pool)),
+		Equipments:     eqSvc,
+		EquipmentsSvc:  eqSvc,
+		Waybills:       wbSvc,
+		WaybillsSvc:    wbSvc,
+		Assignments:    svcassignments.New(svcassignments.NewPostgresRepository(pool)),
 	}
 }
