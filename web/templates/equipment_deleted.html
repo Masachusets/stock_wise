@@ -1,0 +1,35 @@
+{{define "equipmentDeleted"}}
+<h1>Удалённое оборудование</h1>
+
+<a href="/equipments" class="back-link">← Назад к списку</a>
+
+{{if .Items}}
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Инв. номер</th>
+                <th>Наименование</th>
+                <th>Модель</th>
+                <th>Статус</th>
+                <th>Дата удаления</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Items}}
+            <tr>
+                <td><strong>{{.InventoryNumber}}</strong></td>
+                <td>{{if .NomName}}{{.NomName}}{{else}}—{{end}}</td>
+                <td>{{if .ModelName}}{{.ModelName}}{{else}}—{{end}}</td>
+                <td><span class="badge badge-{{.Status}}">{{statusLabel .Status}}</span></td>
+                <td>{{.DeletedAt}}</td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+<div class="info">Всего: {{len .Items}} единиц</div>
+{{else}}
+<p class="info">Нет удалённого оборудования</p>
+{{end}}
+{{end}}

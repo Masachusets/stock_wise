@@ -244,6 +244,50 @@ func registerWebHandlers(mux *http.ServeMux, tpl *template.Template, pool *pgxpo
 		w.WriteHeader(http.StatusOK)
 	})
 
+	mux.HandleFunc("/equipments/deleted", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/equipments/deleted" {
+			http.NotFound(w, r)
+			return
+		}
+		rows, err := pool.Query(r.Context(), `SELECT
+			e.inventory_number, COALESCE(e.model_name, ''),
+			n.code, n.name, e.status, e.deleted_at::text
+		FROM equipments e
+		LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
+		WHERE e.deleted_at IS NOT NULL
+		ORDER BY e.deleted_at DESC`)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		type deletedItem struct {
+			InventoryNumber string
+			ModelName       string
+			NomCode         string
+			NomName         string
+			Status          string
+			DeletedAt       string
+		}
+		var items []deletedItem
+		for rows.Next() {
+			var item deletedItem
+			if err := rows.Scan(&item.InventoryNumber, &item.ModelName, &item.NomCode, &item.NomName, &item.Status, &item.DeletedAt); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			items = append(items, item)
+		}
+
+		data := map[string]interface{}{
+			"Title":   "Удалённое оборудование",
+			"Active":  "equipments",
+			"Items":   items,
+		}
+		renderPage(w, tpl, "equipmentDeleted", data)
+	})
+
 	mux.HandleFunc("/equipments/update", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
