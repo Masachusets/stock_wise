@@ -40,9 +40,13 @@
                 <td>
                     {{if .Assignment}}
                         {{if eq .Assignment.TargetType "employee"}}
-                            👤 {{if .Assignment.FullName}}{{.Assignment.FullName}}{{else}}—{{end}}
+                            👤 {{if .Assignment.FullName}}
+                                {{.Assignment.FullName}}
+                            {{else}}—{{end}}
                         {{else if eq .Assignment.TargetType "department"}}
-                            🏢 {{if .Assignment.DeptName}}{{.Assignment.DeptName}}{{else}}—{{end}}
+                            🏢 {{if .Assignment.DeptName}}
+                                {{.Assignment.DeptName}}
+                            {{else}}—{{end}}
                         {{else if eq .Assignment.TargetType "warehouse"}}
                             📦 Склад
                         {{end}}
