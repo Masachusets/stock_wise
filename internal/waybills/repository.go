@@ -2,6 +2,7 @@ package waybills
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -114,4 +115,67 @@ func (r *postgresRepository) GetStatus(ctx context.Context, id int32) (string, e
 	var status string
 	err := r.db.QueryRow(ctx, "SELECT status FROM waybills WHERE id = $1", id).Scan(&status)
 	return status, err
+}
+
+func (r *postgresRepository) ListForWeb(ctx context.Context) ([]*WaybillListItem, error) {
+	rows, err := r.db.Query(ctx, `SELECT w.id, w.number, w.issue_date::text, w.status,
+		fd.name, td.name
+	FROM waybills w
+	LEFT JOIN departments fd ON w.from_dept = fd.code
+	LEFT JOIN departments td ON w.to_dept = td.code
+	WHERE w.deleted_at IS NULL
+	ORDER BY w.issue_date DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []*WaybillListItem
+	for rows.Next() {
+		w := &WaybillListItem{}
+		if err := rows.Scan(&w.ID, &w.Number, &w.IssueDate, &w.Status, &w.FromName, &w.ToName); err != nil {
+			return nil, err
+		}
+		items = append(items, w)
+	}
+	return items, nil
+}
+
+func (r *postgresRepository) GetForWeb(ctx context.Context, id int32) (*WaybillDetail, error) {
+	w := &WaybillDetail{}
+	err := r.db.QueryRow(ctx, `SELECT w.number, w.issue_date::text, w.status,
+		fd.name, td.name
+	FROM waybills w
+	LEFT JOIN departments fd ON w.from_dept = fd.code
+	LEFT JOIN departments td ON w.to_dept = td.code
+	WHERE w.id = $1`, id).Scan(&w.Number, &w.IssueDate, &w.Status, &w.FromName, &w.ToName)
+	if err != nil {
+		return nil, err
+	}
+
+	eqRows, err := r.db.Query(ctx, `SELECT DISTINCT e.inventory_number, COALESCE(e.model_name, ''), n.name
+	FROM equipments_assignments a
+	JOIN equipments e ON a.equipment_id = e.id
+	LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
+	WHERE a.department_code = (SELECT to_dept FROM waybills WHERE id = $1) AND a.is_active = TRUE`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer eqRows.Close()
+
+	for eqRows.Next() {
+		var item WaybillEquipmentItem
+		var modelName, nomenclature interface{}
+		if err := eqRows.Scan(&item.InventoryNumber, &modelName, &nomenclature); err != nil {
+			return nil, err
+		}
+		if modelName != nil {
+			item.ModelName = fmt.Sprintf("%v", modelName)
+		}
+		if nomenclature != nil {
+			item.Nomenclature = fmt.Sprintf("%v", nomenclature)
+		}
+		w.Equipments = append(w.Equipments, item)
+	}
+	return w, nil
 }

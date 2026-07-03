@@ -11,7 +11,7 @@ type service struct {
 	repo Repository
 }
 
-func New(repo Repository) gen.Service {
+func New(repo Repository) *service {
 	return &service{repo: repo}
 }
 
@@ -137,4 +137,12 @@ func (s *service) Delete(ctx context.Context, p *gen.DeletePayload) error {
 	}
 
 	return s.repo.Delete(ctx, p.ID)
+}
+
+func (s *service) ListForWeb(ctx context.Context) ([]*WaybillListItem, error) {
+	return s.repo.ListForWeb(ctx)
+}
+
+func (s *service) GetForWeb(ctx context.Context, id int32) (*WaybillDetail, error) {
+	return s.repo.GetForWeb(ctx, id)
 }
