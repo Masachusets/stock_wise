@@ -2,74 +2,14 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log"
-	"log/slog"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+	"sync"
 
-	assignments "github.com/Masachusets/stock_wise/gen/assignments"
-	cards "github.com/Masachusets/stock_wise/gen/cards"
-	departments "github.com/Masachusets/stock_wise/gen/departments"
-	equipments "github.com/Masachusets/stock_wise/gen/equipments"
-	assignmentssvr "github.com/Masachusets/stock_wise/gen/http/assignments/server"
-	cardssvr "github.com/Masachusets/stock_wise/gen/http/cards/server"
-	departmentssvr "github.com/Masachusets/stock_wise/gen/http/departments/server"
-	equipmentssvr "github.com/Masachusets/stock_wise/gen/http/equipments/server"
-	nomenclaturessvr "github.com/Masachusets/stock_wise/gen/http/nomenclatures/server"
-	waybillssvr "github.com/Masachusets/stock_wise/gen/http/waybills/server"
-	nomenclatures "github.com/Masachusets/stock_wise/gen/nomenclatures"
-	waybills "github.com/Masachusets/stock_wise/gen/waybills"
-	svcassignments "github.com/Masachusets/stock_wise/internal/assignments"
-	svccards "github.com/Masachusets/stock_wise/internal/cards"
 	"github.com/Masachusets/stock_wise/internal/config"
-	svcdepartments "github.com/Masachusets/stock_wise/internal/departments"
-	svcequipments "github.com/Masachusets/stock_wise/internal/equipments"
-	svcnomenclatures "github.com/Masachusets/stock_wise/internal/nomenclatures"
-	svcwaybills "github.com/Masachusets/stock_wise/internal/waybills"
 	"github.com/jackc/pgx/v5/pgxpool"
-	goahttp "goa.design/goa/v3/http"
+	"goa.design/clue/log"
 )
-
-// loggingHandler — HTTP-мидлвейнер для логирования запросов.
-type loggingHandler struct {
-	handler http.Handler
-}
-
-func (h *loggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	sw := &statusWriter{ResponseWriter: w, status: http.StatusOK}
-	h.handler.ServeHTTP(sw, r)
-	duration := time.Since(start).String()
-
-	if sw.status >= 500 {
-		slog.Error("request",
-			"method", r.Method,
-			"path", r.URL.Path,
-			"status", sw.status,
-			"duration", duration,
-		)
-	} else if sw.status >= 400 {
-		slog.Warn("request",
-			"method", r.Method,
-			"path", r.URL.Path,
-			"status", sw.status,
-			"duration", duration,
-		)
-	} else {
-		slog.Info("request",
-			"method", r.Method,
-			"path", r.URL.Path,
-			"status", sw.status,
-			"duration", duration,
-		)
-	}
-}
-
 type statusWriter struct {
 	http.ResponseWriter
 	status int
@@ -82,137 +22,61 @@ func (w *statusWriter) WriteHeader(code int) {
 
 // runApp инициализирует и запускает HTTP-сервер StockWise.
 func runApp(cfg *config.Config) error {
-ctx := context.Background()
-	
-	// Настройка уровня логирования
-	var level slog.Level
-	if err := level.UnmarshalText([]byte(cfg.Log)); err != nil {
-		level = slog.LevelInfo
+	// Настройка логирования
+	var format log.FormatFunc
+	switch cfg.Log {
+	case "json":
+		format = log.FormatJSON
+	case "terminal":
+		format = log.FormatTerminal
+	default:
+		format = log.FormatText
 	}
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})))
 
-	slog.Info("starting server", "port", cfg.Port)
+	ctx := log.Context(context.Background(), log.WithFormat(format))
+	ctx, cancel := context.WithCancel(ctx)
+
+	if cfg.Debug {
+		ctx = log.Context(context.Background(), log.WithFormat(format), log.WithDebug())
+		log.Debugf(ctx, "debug logs enabled")
+	}
+	
+	log.Printf(ctx, "starting server on port: %v", cfg.Port)
+
+	// Создаем канал, используемый обработчиком сигналов и 
+	// серверными горутинами для уведомления главной горутины 
+	// о необходимости остановки сервера.
+	errCh := make(chan error, 1)
 
 	// Подключение к PostgreSQL
 	pool, err := pgxpool.New(ctx, cfg.DB)
 	if err != nil {
-		return fmt.Errorf("connect to database: %w", err)
+		log.Fatalf(ctx, err, "db connect: %v", err)
 	}
 	defer pool.Close()
 
 	if err := pool.Ping(ctx); err != nil {
-		return fmt.Errorf("ping database: %w", err)
+		log.Errorf(ctx, err, "db ping: %v", err)
+		errCh <- err
 	}
-	slog.Info("connected to PostgreSQL")
+	log.Printf(ctx, "connected to PostgreSQL")
 
-	// Создание сервисов (internal/*)
-	nomenclaturesRepo := svcnomenclatures.NewPostgresRepository(pool)
-	nomenclaturesSvc := svcnomenclatures.New(nomenclaturesRepo)
-	departmentsRepo := svcdepartments.NewPostgresRepository(pool)
-	departmentsSvc := svcdepartments.New(departmentsRepo)
-	cardsRepo := svccards.NewPostgresRepository(pool)
-	cardsSvc := svccards.New(cardsRepo)
-	equipmentsRepo := svcequipments.NewPostgresRepository(pool)
-	equipmentsSvc := svcequipments.New(equipmentsRepo)
-	waybillsRepo := svcwaybills.NewPostgresRepository(pool)
-	waybillsSvc := svcwaybills.New(waybillsRepo)
-	assignmentsRepo := svcassignments.NewPostgresRepository(pool)
-	assignmentsSvc := svcassignments.New(assignmentsRepo)
+	var wg sync.WaitGroup
 
-	// Создание endpoints (gen/*)
-	nomenclaturesEndpoints := nomenclatures.NewEndpoints(nomenclaturesSvc)
-	departmentsEndpoints := departments.NewEndpoints(departmentsSvc)
-	cardsEndpoints := cards.NewEndpoints(cardsSvc)
-	equipmentsEndpoints := equipments.NewEndpoints(equipmentsSvc)
-	waybillsEndpoints := waybills.NewEndpoints(waybillsSvc)
-	assignmentsEndpoints := assignments.NewEndpoints(assignmentsSvc)
-
-	// Настройка HTTP-транспорта
-	mux := goahttp.NewMuxer()
-	dec := goahttp.RequestDecoder
-	enc := goahttp.ResponseEncoder
-	// Обработчик ошибок Goa — логирует ошибки с контекстом запроса
-	eh := func(ctx context.Context, w http.ResponseWriter, err error) {
-		slog.Error("endpoint error", "error", err)
-	}
-
-	// Создание HTTP-хэндлеров
-	nomSvr := nomenclaturessvr.New(nomenclaturesEndpoints, mux, dec, enc, eh, nil)
-	deptSvr := departmentssvr.New(departmentsEndpoints, mux, dec, enc, eh, nil)
-	cardsSvr := cardssvr.New(cardsEndpoints, mux, dec, enc, eh, nil)
-	eqSvr := equipmentssvr.New(equipmentsEndpoints, mux, dec, enc, eh, nil)
-	wbSvr := waybillssvr.New(waybillsEndpoints, mux, dec, enc, eh, nil)
-	asnSvr := assignmentssvr.New(assignmentsEndpoints, mux, dec, enc, eh, nil)
-
-	// Монтирование маршрутов
-	nomenclaturessvr.Mount(mux, nomSvr)
-	departmentssvr.Mount(mux, deptSvr)
-	cardssvr.Mount(mux, cardsSvr)
-	equipmentssvr.Mount(mux, eqSvr)
-	waybillssvr.Mount(mux, wbSvr)
-	assignmentssvr.Mount(mux, asnSvr)
-
-	// Вывод смонтированных маршрутов
-	for _, m := range nomSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-	for _, m := range deptSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-	for _, m := range cardsSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-	for _, m := range eqSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-	for _, m := range wbSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-	for _, m := range asnSvr.Mounts {
-		slog.Debug("route mounted", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-	}
-
-	// Создание HTTP-сервера
-	rootMux := http.NewServeMux()
-
-	// Регистрация веб-хэндлеров (шаблоны + статика)
-	tpl := loadTemplates()
-	registerWebHandlers(rootMux, tpl, pool, equipmentsSvc, waybillsSvc)
-
-	// Монтирование API-хэндлеров на /api/
-	rootMux.Handle("/api/", http.StripPrefix("/api", mux))
-
-	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", cfg.Port),
-		Handler:           &loggingHandler{handler: rootMux},
-		ReadHeaderTimeout: 60 * time.Second,
-	}
-
-	// Контекст сигналов (SIGINT/SIGTERM) для graceful shutdown
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
-	// Запуск HTTP-сервера
-	go func() {
-		slog.Info("server listening", "port", cfg.Port)
-		if err := srv.ListenAndServe(); err != nil &&
-		errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("server error: %v", err)
-		}
-	}()
+	handleHTTPServer(ctx, cfg, &wg, pool, errCh)
 
 	// Ожидание сигнала или ошибки сервера
-	<-ctx.Done()
-	slog.Info("shutting down server")
-
-	// Graceful shutdown с таймаутом 30 секунд
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		return fmt.Errorf("shutdown: %w", err)
+	select {
+	case <-ctx.Done():
+		log.Printf(ctx, "shutting down server")
+	case err := <-errCh:
+		fmt.Printf("server failed: %v", err)
 	}
 
-	slog.Info("server stopped")
+	// Отправка сигнал отмены горутинам.
+	cancel()
+	
+	wg.Wait()
+	log.Printf(ctx, "server stopped")
 	return nil
 }
