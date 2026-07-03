@@ -8,18 +8,17 @@ import (
 	"strings"
 
 	"github.com/Masachusets/stock_wise/gen/waybills"
-	"github.com/jackc/pgx/v5/pgxpool"
+	svcwaybills "github.com/Masachusets/stock_wise/internal/waybills"
 	"goa.design/clue/log"
 )
 
 type WaybillHandlers struct {
-	tpl  *template.Template
-	pool *pgxpool.Pool
-	svc  waybills.Service
+	tpl *template.Template
+	svc svcwaybills.WebService
 }
 
-func NewWaybillHandlers(tpl *template.Template, pool *pgxpool.Pool, svc waybills.Service) *WaybillHandlers {
-	return &WaybillHandlers{tpl: tpl, pool: pool, svc: svc}
+func NewWaybillHandlers(tpl *template.Template, svc svcwaybills.WebService) *WaybillHandlers {
+	return &WaybillHandlers{tpl: tpl, svc: svc}
 }
 
 func (h *WaybillHandlers) Register(mux *http.ServeMux) {
@@ -34,41 +33,16 @@ func (h *WaybillHandlers) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := h.pool.Query(r.Context(), `SELECT w.id, w.number, w.issue_date::text, w.status,
-		fd.name, td.name
-	FROM waybills w
-	LEFT JOIN departments fd ON w.from_dept = fd.code
-	LEFT JOIN departments td ON w.to_dept = td.code
-	WHERE w.deleted_at IS NULL
-	ORDER BY w.issue_date DESC`)
+	items, err := h.svc.ListForWeb(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-	defer rows.Close()
-
-	type waybillRow struct {
-		ID        int32
-		Number    string
-		IssueDate string
-		Status    string
-		FromName  *string
-		ToName    *string
-	}
-	var waybillsList []waybillRow
-	for rows.Next() {
-		var wb waybillRow
-		if err := rows.Scan(&wb.ID, &wb.Number, &wb.IssueDate, &wb.Status, &wb.FromName, &wb.ToName); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		waybillsList = append(waybillsList, wb)
 	}
 
 	data := map[string]interface{}{
 		"Title":    "Накладные",
 		"Active":   "waybills",
-		"Waybills": waybillsList,
+		"Waybills": items,
 	}
 	RenderPage(w, h.tpl, "waybillsPage", data)
 }
@@ -85,63 +59,18 @@ func (h *WaybillHandlers) detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var wb struct {
-		Number    string
-		IssueDate string
-		Status    string
-		FromName  *string
-		ToName    *string
-	}
-	err = h.pool.QueryRow(r.Context(), `SELECT w.number, w.issue_date::text, w.status,
-		fd.name, td.name
-	FROM waybills w
-	LEFT JOIN departments fd ON w.from_dept = fd.code
-	LEFT JOIN departments td ON w.to_dept = td.code
-	WHERE w.id = $1`, id).Scan(&wb.Number, &wb.IssueDate, &wb.Status, &wb.FromName, &wb.ToName)
+	detail, err := h.svc.GetForWeb(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "накладная не найдена", http.StatusNotFound)
 		return
 	}
 
-	eqRows, err := h.pool.Query(r.Context(), `SELECT DISTINCT e.inventory_number, COALESCE(e.model_name, ''), n.name
-	FROM equipments_assignments a
-	JOIN equipments e ON a.equipment_id = e.id
-	LEFT JOIN nomenclatures n ON e.nomenclature_id = n.id
-	WHERE a.waybill_id = $1`, id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer eqRows.Close()
-
-	type eqItem struct {
-		InventoryNumber string
-		ModelName       string
-		Nomenclature    string
-	}
-	var equipmentsList []eqItem
-	for eqRows.Next() {
-		var item eqItem
-		var modelName, nomenclature interface{}
-		if err := eqRows.Scan(&item.InventoryNumber, &modelName, &nomenclature); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if modelName != nil {
-			item.ModelName = fmt.Sprintf("%v", modelName)
-		}
-		if nomenclature != nil {
-			item.Nomenclature = fmt.Sprintf("%v", nomenclature)
-		}
-		equipmentsList = append(equipmentsList, item)
-	}
-
 	data := map[string]interface{}{
-		"Title":      fmt.Sprintf("Накладная %s", wb.Number),
+		"Title":      fmt.Sprintf("Накладная %s", detail.Number),
 		"Active":     "waybills",
-		"Waybill":    wb,
+		"Waybill":    detail,
 		"WaybillID":  id,
-		"Equipments": equipmentsList,
+		"Equipments": detail.Equipments,
 	}
 	RenderPage(w, h.tpl, "waybillDetail", data)
 }
