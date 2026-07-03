@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/Masachusets/stock_wise/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -65,10 +68,16 @@ func runApp(cfg *config.Config) error {
 
 	handleHTTPServer(ctx, cfg, &wg, pool, errCh)
 
+	// Обработка сигналов SIGINT/SIGTERM для graceful shutdown
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
 	// Ожидание сигнала или ошибки сервера
 	select {
+	case <-sig:
+		log.Printf(ctx, "received shutdown signal")
 	case <-ctx.Done():
-		log.Printf(ctx, "shutting down server")
+		log.Printf(ctx, "context cancelled")
 	case err := <-errCh:
 		fmt.Printf("server failed: %v", err)
 	}
@@ -77,6 +86,8 @@ func runApp(cfg *config.Config) error {
 	cancel()
 	
 	wg.Wait()
+	log.Printf(ctx, "closing database connection")
+	pool.Close()
 	log.Printf(ctx, "server stopped")
 	return nil
 }
