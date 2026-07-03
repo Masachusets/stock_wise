@@ -22,16 +22,20 @@ type Services struct {
 	Cards         cards.Service
 	Equipments    equipments.Service
 	Waybills      waybills.Service
+	WaybillsSvc   svcwaybills.WebService
 	Assignments   assignments.Service
 }
 
 func NewServices(pool *pgxpool.Pool) *Services {
+	wbRepo := svcwaybills.NewPostgresRepository(pool)
+	wbSvc := svcwaybills.New(wbRepo)
 	return &Services{
 		Nomenclatures: svcnomenclatures.New(svcnomenclatures.NewPostgresRepository(pool)),
 		Departments:   svcdepartments.New(svcdepartments.NewPostgresRepository(pool)),
 		Cards:         svccards.New(svccards.NewPostgresRepository(pool)),
 		Equipments:    svcequipments.New(svcequipments.NewPostgresRepository(pool)),
-		Waybills:      svcwaybills.New(svcwaybills.NewPostgresRepository(pool)),
+		Waybills:      wbSvc,
+		WaybillsSvc:   wbSvc,
 		Assignments:   svcassignments.New(svcassignments.NewPostgresRepository(pool)),
 	}
 }
